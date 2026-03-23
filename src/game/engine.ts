@@ -59,7 +59,13 @@ export function pour(state: GameState, fromIndex: number, toIndex: number): Game
 
   const topColor = getTopColor(source)!;
   const available = VIAL_CAPACITY - dest.length;
-  const topCount = getTopCount(source);
+  // Don't count hidden segments as part of the top group
+  const sourceHidden = state.hidden[fromIndex] ?? [];
+  let topCount = 0;
+  for (let i = source.length - 1; i >= 0; i--) {
+    if (source[i] === topColor && !sourceHidden[i]) topCount++;
+    else break;
+  }
   const count = Math.min(topCount, available);
 
   const newSource: Vial = source.slice(0, source.length - count);
