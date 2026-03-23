@@ -26,12 +26,12 @@ export const ALL_COLORS: Color[] = [
 export const COLOR_VALUES: Record<Color, string> = {
   red: '#E74C3C',
   blue: '#3498DB',
-  green: '#2ECC71',
+  green: '#27AE60',
   yellow: '#F1C40F',
   purple: '#9B59B6',
   orange: '#F39C12',
   pink: '#FF69B4',
-  teal: '#1ABC9C',
+  teal: '#00CED1',
   brown: '#8B5E3C',
   lime: '#A8D829',
 };
