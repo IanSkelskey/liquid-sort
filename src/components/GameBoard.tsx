@@ -7,9 +7,11 @@ interface GameBoardProps {
   onSelectVial: (index: number) => void;
 }
 
-function isVialComplete(vial: string[]): boolean {
+function isVialComplete(vial: string[], hidden: boolean[]): boolean {
   return (
-    vial.length === VIAL_CAPACITY && vial.every((c) => c === vial[0])
+    vial.length === VIAL_CAPACITY &&
+    vial.every((c) => c === vial[0]) &&
+    !hidden.some((h) => h)
   );
 }
 
@@ -22,7 +24,7 @@ export function GameBoard({ state, onSelectVial }: GameBoardProps) {
           vial={vial}
           hiddenMask={state.hidden[i] ?? []}
           isSelected={state.selectedVial === i}
-          isComplete={isVialComplete(vial)}
+          isComplete={isVialComplete(vial, state.hidden[i] ?? [])}
           onClick={() => onSelectVial(i)}
         />
       ))}

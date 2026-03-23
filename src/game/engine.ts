@@ -99,10 +99,12 @@ function isVialComplete(vial: Vial): boolean {
   return vial.length === VIAL_CAPACITY && vial.every((c) => c === vial[0]);
 }
 
-/** Checks if the game is won: every vial is either empty or complete. */
+/** Checks if the game is won: every vial is either empty or complete with no hidden segments. */
 export function checkWin(state: GameState): boolean {
   return state.vials.every(
-    (vial) => vial.length === 0 || isVialComplete(vial)
+    (vial, i) =>
+      vial.length === 0 ||
+      (isVialComplete(vial) && !(state.hidden[i]?.some((h) => h)))
   );
 }
 
