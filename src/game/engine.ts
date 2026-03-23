@@ -54,8 +54,9 @@ export function pour(state: GameState, fromIndex: number, toIndex: number): Game
   if (fromIndex === toIndex) return null;
   if (!canPour(source, dest)) return null;
 
-  // Don't allow pouring from a completed single-color vial
-  if (isVialComplete(source)) return null;
+  // Don't allow pouring from a completed single-color vial (only if fully revealed)
+  const fromHidden = state.hidden[fromIndex] ?? [];
+  if (isVialComplete(source) && !fromHidden.some((h) => h)) return null;
 
   const topColor = getTopColor(source)!;
   const available = VIAL_CAPACITY - dest.length;
