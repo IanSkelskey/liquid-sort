@@ -20,6 +20,7 @@ export function GameBoard({ state, onSelectVial }: GameBoardProps) {
         <Vial
           key={i}
           vial={vial}
+          hiddenMask={state.hidden[i] ?? []}
           isSelected={state.selectedVial === i}
           isComplete={isVialComplete(vial)}
           onClick={() => onSelectVial(i)}

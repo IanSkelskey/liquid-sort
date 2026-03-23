@@ -1,5 +1,23 @@
 import { type Color, type GameState, type Vial, VIAL_CAPACITY } from './types';
 
+/** Reveals the top segment of each vial (hidden segments become visible when on top). */
+export function revealTopSegments(state: GameState): GameState {
+  let changed = false;
+  const newHidden = state.hidden.map((vialHidden, vi) => {
+    const vial = state.vials[vi];
+    if (vial.length === 0) return vialHidden;
+    const topIdx = vial.length - 1;
+    if (topIdx < vialHidden.length && vialHidden[topIdx]) {
+      changed = true;
+      const copy = [...vialHidden];
+      copy[topIdx] = false;
+      return copy;
+    }
+    return vialHidden;
+  });
+  return changed ? { ...state, hidden: newHidden } : state;
+}
+
 /** Returns the top color of a vial, or undefined if empty. */
 export function getTopColor(vial: Vial): Color | undefined {
   return vial.length > 0 ? vial[vial.length - 1] : undefined;
@@ -59,9 +77,15 @@ export function pour(state: GameState, fromIndex: number, toIndex: number): Game
     selectedVial: null,
     moveHistory: [...state.moveHistory, { from: fromIndex, to: toIndex, count }],
     moveCount: state.moveCount + 1,
+    hidden: state.hidden.map((vh, vi) => {
+      if (vi === fromIndex) return vh.slice(0, newSource.length);
+      if (vi === toIndex) return [...vh, ...Array<boolean>(count).fill(false)];
+      return vh;
+    }),
   };
 
-  return { ...newState, won: checkWin(newState) };
+  const revealed = revealTopSegments(newState);
+  return { ...revealed, won: checkWin(revealed) };
 }
 
 /** A vial is complete if it has exactly VIAL_CAPACITY segments of the same color. */
@@ -96,14 +120,19 @@ export function undo(state: GameState): GameState | null {
     return v;
   });
 
-  return {
+  return revealTopSegments({
     ...state,
     vials: newVials,
     selectedVial: null,
     moveHistory: state.moveHistory.slice(0, -1),
     moveCount: state.moveCount - 1,
     won: false,
-  };
+    hidden: state.hidden.map((vh, vi) => {
+      if (vi === to) return vh.slice(0, newSource.length);
+      if (vi === from) return [...vh, ...Array<boolean>(count).fill(false)];
+      return vh;
+    }),
+  });
 }
 
 /** Shuffles the contents of a single vial. Returns new state. */
@@ -130,11 +159,11 @@ export function shuffleVial(state: GameState, vialIndex: number): GameState {
     i === vialIndex ? shuffled : v
   );
 
-  return {
+  return revealTopSegments({
     ...state,
     vials: newVials,
     selectedVial: null,
-  };
+  });
 }
 
 /** Adds an empty vial to the game. Returns new state. */
@@ -142,6 +171,7 @@ export function addEmptyVial(state: GameState): GameState {
   return {
     ...state,
     vials: [...state.vials, []],
+    hidden: [...state.hidden, []],
     addedVial: true,
     selectedVial: null,
   };

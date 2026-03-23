@@ -53,6 +53,7 @@ export const ADD_VIAL_COST = 5;
 
 export interface GameState {
   vials: Vial[];
+  hidden: boolean[][];
   selectedVial: number | null;
   moveHistory: Move[];
   level: number;

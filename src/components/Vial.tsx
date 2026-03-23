@@ -3,6 +3,7 @@ import { type Vial as VialType, COLOR_VALUES, VIAL_CAPACITY } from '../game/type
 
 interface VialProps {
   vial: VialType;
+  hiddenMask: boolean[];
   isSelected: boolean;
   onClick: () => void;
   isComplete: boolean;
@@ -16,7 +17,7 @@ const INNER_WIDTH = 38;
 const INNER_X = (VIAL_WIDTH - INNER_WIDTH) / 2;
 const CORNER_RADIUS = 10;
 
-export function Vial({ vial, isSelected, onClick, isComplete }: VialProps) {
+export function Vial({ vial, hiddenMask, isSelected, onClick, isComplete }: VialProps) {
   return (
     <motion.div
       onClick={onClick}
@@ -71,6 +72,8 @@ export function Vial({ vial, isSelected, onClick, isComplete }: VialProps) {
           const segY = BOTTOM_Y - (i + 1) * SEGMENT_HEIGHT;
           const isBottomSegment = i === 0;
           const isTopSegment = i === vial.length - 1;
+          const isHidden = hiddenMask[i] ?? false;
+          const fillColor = isHidden ? '#888888' : COLOR_VALUES[color];
 
           return (
             <motion.g key={i}>
@@ -79,7 +82,7 @@ export function Vial({ vial, isSelected, onClick, isComplete }: VialProps) {
                 x={INNER_X}
                 width={INNER_WIDTH}
                 height={SEGMENT_HEIGHT}
-                fill={COLOR_VALUES[color]}
+                fill={fillColor}
                 initial={{ y: segY - 20, opacity: 0 }}
                 animate={{ y: segY, opacity: 1 }}
                 transition={{
@@ -98,14 +101,31 @@ export function Vial({ vial, isSelected, onClick, isComplete }: VialProps) {
                   y={segY}
                   width={INNER_WIDTH}
                   height={CORNER_RADIUS}
-                  fill={COLOR_VALUES[color]}
+                  fill={fillColor}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: i * 0.03 }}
                 />
               )}
+              {/* Question mark for hidden segments */}
+              {isHidden && (
+                <motion.text
+                  x={VIAL_WIDTH / 2}
+                  y={segY + SEGMENT_HEIGHT / 2 + 5}
+                  textAnchor="middle"
+                  fill="rgba(255,255,255,0.8)"
+                  fontSize="16"
+                  fontWeight="800"
+                  style={{ pointerEvents: 'none', userSelect: 'none' }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: i * 0.03 + 0.1 }}
+                >
+                  ?
+                </motion.text>
+              )}
               {/* Top surface highlight */}
-              {isTopSegment && (
+              {isTopSegment && !isHidden && (
                 <motion.rect
                   x={INNER_X + 4}
                   y={segY + 2}

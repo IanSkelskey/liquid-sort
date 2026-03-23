@@ -1,5 +1,5 @@
 import { type Color, type Vial, type GameState, ALL_COLORS, VIAL_CAPACITY } from './types';
-import { canPour } from './engine';
+import { canPour, revealTopSegments } from './engine';
 
 /**
  * Returns the number of colors and empty vials for a given level.
@@ -137,8 +137,11 @@ export function isSolvable(vials: Vial[]): boolean {
 
 /** Creates the initial game state for a given level. */
 export function createGameState(level: number, coins?: number): GameState {
-  return {
-    vials: generateLevel(level),
+  const vials = generateLevel(level);
+  const hidden = generateHidden(level, vials);
+  const state: GameState = {
+    vials,
+    hidden,
     selectedVial: null,
     moveHistory: [],
     level,
@@ -147,6 +150,25 @@ export function createGameState(level: number, coins?: number): GameState {
     coins: coins ?? getSavedCoins(),
     addedVial: false,
   };
+  return revealTopSegments(state);
+}
+
+/** Generates the hidden mask for a level. Hidden segments start at level 11+. */
+function generateHidden(level: number, vials: Vial[]): boolean[][] {
+  if (level < 11) return vials.map(() => []);
+
+  const rng = createRng(level * 3571 + 997);
+  // Chance per non-top segment to be hidden: ramps from 20% at level 11 to 60% at level 50+
+  const chance = Math.min(0.2 + (level - 11) * 0.01, 0.6);
+
+  return vials.map((vial) => {
+    if (vial.length === 0) return [];
+    return vial.map((_, i) => {
+      // Top segment is never initially hidden (will be revealed anyway)
+      if (i === vial.length - 1) return false;
+      return rng() < chance;
+    });
+  });
 }
 
 /** Gets the current saved level from localStorage, defaulting to 1. */
