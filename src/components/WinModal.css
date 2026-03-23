@@ -1,0 +1,93 @@
+.win-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+
+.win-modal {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 44px 48px;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  max-width: 360px;
+  width: 100%;
+}
+
+.win-emoji {
+  font-size: 3.5rem;
+  margin-bottom: 12px;
+}
+
+.win-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+}
+
+.win-stats {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin: 0 0 16px;
+  font-weight: 500;
+}
+
+.win-reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.15));
+  border: 1.5px solid rgba(251, 191, 36, 0.3);
+  border-radius: 20px;
+  padding: 8px 20px;
+  margin-bottom: 24px;
+}
+
+.reward-label {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #f59e0b;
+}
+
+.reward-icon {
+  font-size: 1.1rem;
+}
+
+.win-btn {
+  padding: 14px 40px;
+  border: none;
+  border-radius: 14px;
+  background: var(--gradient-btn);
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 50px;
+  letter-spacing: 0.2px;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
+}
+
+.win-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+}
+
+.win-btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+@media (max-width: 480px) {
+  .win-modal {
+    padding: 32px 24px;
+  }
+}

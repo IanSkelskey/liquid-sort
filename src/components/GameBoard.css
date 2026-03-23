@@ -1,0 +1,19 @@
+.game-board {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  align-content: flex-start;
+  gap: 14px;
+  padding: 24px 16px 40px;
+  max-width: 600px;
+  margin: 0 auto;
+  flex: 1;
+}
+
+@media (max-width: 480px) {
+  .game-board {
+    gap: 8px;
+    padding: 16px 8px 32px;
+  }
+}

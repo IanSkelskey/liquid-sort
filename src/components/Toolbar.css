@@ -1,0 +1,102 @@
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 24px 4px;
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+  gap: 12px;
+}
+
+.toolbar-coins {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.coin-icon {
+  font-size: 1.1rem;
+}
+
+.coin-count {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  min-width: 20px;
+  text-align: center;
+}
+
+.toolbar-powers {
+  display: flex;
+  gap: 8px;
+}
+
+.power-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  min-height: 40px;
+}
+
+.power-btn:hover:not(:disabled) {
+  background: var(--bg-surface-hover);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.power-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.97);
+}
+
+.power-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.power-icon {
+  font-size: 1rem;
+}
+
+.power-label {
+  display: inline;
+}
+
+.power-cost {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+@media (max-width: 480px) {
+  .toolbar {
+    padding: 6px 16px 2px;
+  }
+
+  .power-btn {
+    padding: 5px 8px;
+    font-size: 0.75rem;
+    gap: 3px;
+  }
+
+  .power-label {
+    display: none;
+  }
+}
