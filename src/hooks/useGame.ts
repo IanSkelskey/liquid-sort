@@ -1,7 +1,8 @@
-import { useReducer, useCallback } from 'react';
+import { useReducer, useCallback, useEffect, useRef } from 'react';
 import { type GameState, UNDO_COST, SHUFFLE_COST, ADD_VIAL_COST } from '../game/types';
 import { pour, undo, shuffleVial, addEmptyVial, calculateReward } from '../game/engine';
 import { createGameState, getSavedLevel, saveLevel, saveCoins, clearSave } from '../game/levels';
+import { useSoundEffects } from './useSoundEffects';
 
 type Action =
   | { type: 'SELECT_VIAL'; index: number }
@@ -103,10 +104,28 @@ export function useGame() {
   const [state, dispatch] = useReducer(reducer, null, () =>
     createGameState(getSavedLevel())
   );
+  const { play } = useSoundEffects();
+  const previousWonRef = useRef(state.won);
+
+  useEffect(() => {
+    if (!previousWonRef.current && state.won) {
+      play('levelComplete');
+    }
+
+    previousWonRef.current = state.won;
+  }, [play, state.won]);
 
   const selectVial = useCallback(
-    (index: number) => dispatch({ type: 'SELECT_VIAL', index }),
-    []
+    (index: number) => {
+      const nextState = reducer(state, { type: 'SELECT_VIAL', index });
+
+      if (nextState !== state && nextState.selectedVial !== null) {
+        play('pickupVial');
+      }
+
+      dispatch({ type: 'SELECT_VIAL', index });
+    },
+    [play, state]
   );
 
   const undoMove = useCallback(() => dispatch({ type: 'UNDO' }), []);

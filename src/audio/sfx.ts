@@ -1,0 +1,60 @@
+export type SoundEffectName = 'pickupVial' | 'levelComplete';
+
+const soundEffectSources: Record<SoundEffectName, string> = {
+  pickupVial: new URL('../../assets/pickup_vial.wav', import.meta.url).href,
+  levelComplete: new URL('../../assets/level_complete.mp3', import.meta.url).href,
+};
+
+const defaultVolumes: Record<SoundEffectName, number> = {
+  pickupVial: 0.45,
+  levelComplete: 0.6,
+};
+
+const soundPools = new Map<SoundEffectName, HTMLAudioElement[]>();
+
+function getSoundPool(name: SoundEffectName): HTMLAudioElement[] {
+  let pool = soundPools.get(name);
+  if (!pool) {
+    pool = [];
+    soundPools.set(name, pool);
+  }
+  return pool;
+}
+
+function createAudioInstance(name: SoundEffectName): HTMLAudioElement {
+  const audio = new Audio(soundEffectSources[name]);
+  audio.preload = 'auto';
+  return audio;
+}
+
+export function primeSoundEffects(): void {
+  for (const name of Object.keys(soundEffectSources) as SoundEffectName[]) {
+    const pool = getSoundPool(name);
+    if (pool.length === 0) {
+      pool.push(createAudioInstance(name));
+    }
+    pool[0].load();
+  }
+}
+
+export function playSoundEffect(
+  name: SoundEffectName,
+  options?: { volume?: number }
+): void {
+  if (typeof Audio === 'undefined') return;
+
+  const pool = getSoundPool(name);
+  const reusableAudio = pool.find((audio) => audio.paused || audio.ended);
+  const audio = reusableAudio ?? createAudioInstance(name);
+
+  if (!reusableAudio) {
+    pool.push(audio);
+  }
+
+  audio.currentTime = 0;
+  audio.volume = options?.volume ?? defaultVolumes[name];
+
+  void audio.play().catch(() => {
+    // Ignore browser autoplay rejections until the user interacts.
+  });
+}
