@@ -214,7 +214,21 @@ export function hasMovesLeft(state: GameState): boolean {
     if (source.length === VIAL_CAPACITY && source.every((c) => c === source[0])) continue;
     for (let j = 0; j < state.vials.length; j++) {
       if (i === j) continue;
-      if (canPour(source, state.vials[j])) return true;
+      if (!canPour(source, state.vials[j])) continue;
+
+      const dest = state.vials[j];
+      const topColor = getTopColor(source)!;
+      const topCount = getTopCount(source);
+      const wouldEmptySource = topCount === source.length;
+
+      // Skip only if source is all one color, the move wouldn't empty
+      // the source vial, and wouldn't complete the destination
+      if (source.every((c) => c === topColor) && !wouldEmptySource) {
+        if (dest.length === 0) continue; // moving to empty without freeing source
+        if (dest.length + topCount < VIAL_CAPACITY) continue; // won't complete dest
+      }
+
+      return true;
     }
   }
   return false;
