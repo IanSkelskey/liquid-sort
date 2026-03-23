@@ -111,12 +111,20 @@ export function shuffleVial(state: GameState, vialIndex: number): GameState {
   const vial = state.vials[vialIndex];
   if (vial.length <= 1) return state;
 
-  // Fisher-Yates shuffle
-  const shuffled: Vial = [...vial];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
+  // Fisher-Yates shuffle, retry if result matches original
+  let shuffled: Vial;
+  let attempts = 0;
+  do {
+    shuffled = [...vial];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    attempts++;
+  } while (
+    attempts < 100 &&
+    shuffled.every((c, i) => c === vial[i])
+  );
 
   const newVials: Vial[] = state.vials.map((v, i) =>
     i === vialIndex ? shuffled : v
