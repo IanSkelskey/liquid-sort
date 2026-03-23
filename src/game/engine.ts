@@ -146,20 +146,40 @@ export function shuffleVial(state: GameState, vialIndex: number): GameState {
   const vial = state.vials[vialIndex];
   if (vial.length <= 1) return state;
 
-  // Fisher-Yates shuffle, retry if result matches original
-  let shuffled: Vial;
+  const vialHidden = state.hidden[vialIndex] ?? [];
+
+  // Collect indices and colors of only revealed segments
+  const revealedIndices: number[] = [];
+  const revealedColors: Color[] = [];
+  for (let i = 0; i < vial.length; i++) {
+    if (!vialHidden[i]) {
+      revealedIndices.push(i);
+      revealedColors.push(vial[i]);
+    }
+  }
+
+  if (revealedColors.length <= 1) return state;
+
+  // Fisher-Yates shuffle on revealed colors only, retry if unchanged
+  let shuffledColors: Color[];
   let attempts = 0;
   do {
-    shuffled = [...vial];
-    for (let i = shuffled.length - 1; i > 0; i--) {
+    shuffledColors = [...revealedColors];
+    for (let i = shuffledColors.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      [shuffledColors[i], shuffledColors[j]] = [shuffledColors[j], shuffledColors[i]];
     }
     attempts++;
   } while (
     attempts < 100 &&
-    shuffled.every((c, i) => c === vial[i])
+    shuffledColors.every((c, i) => c === revealedColors[i])
   );
+
+  // Reconstruct vial with hidden segments in place
+  const shuffled: Vial = [...vial];
+  for (let i = 0; i < revealedIndices.length; i++) {
+    shuffled[revealedIndices[i]] = shuffledColors[i];
+  }
 
   const newVials: Vial[] = state.vials.map((v, i) =>
     i === vialIndex ? shuffled : v
