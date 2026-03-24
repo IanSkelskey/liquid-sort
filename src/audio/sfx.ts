@@ -1,16 +1,21 @@
-export type SoundEffectName = 'pickupVial' | 'levelComplete';
+export type SoundEffectName = 'pickupVial' | 'levelComplete' | 'pour' | 'vialFull';
 
 const soundEffectSources: Record<SoundEffectName, string> = {
   pickupVial: new URL('../../assets/pickup_vial.wav', import.meta.url).href,
   levelComplete: new URL('../../assets/level_complete.mp3', import.meta.url).href,
+  pour: new URL('../../assets/bubble.mp3', import.meta.url).href,
+  vialFull: new URL('../../assets/vial_full.mp3', import.meta.url).href,
 };
 
 const defaultVolumes: Record<SoundEffectName, number> = {
   pickupVial: 0.45,
   levelComplete: 0.6,
+  pour: 0.4,
+  vialFull: 0.5,
 };
 
 const soundPools = new Map<SoundEffectName, HTMLAudioElement[]>();
+const playbackStopTimers = new WeakMap<HTMLAudioElement, number>();
 
 function getSoundPool(name: SoundEffectName): HTMLAudioElement[] {
   let pool = soundPools.get(name);
@@ -39,7 +44,7 @@ export function primeSoundEffects(): void {
 
 export function playSoundEffect(
   name: SoundEffectName,
-  options?: { volume?: number }
+  options?: { volume?: number; durationMs?: number }
 ): void {
   if (typeof Audio === 'undefined') return;
 
@@ -51,10 +56,26 @@ export function playSoundEffect(
     pool.push(audio);
   }
 
+  const stopTimer = playbackStopTimers.get(audio);
+  if (stopTimer !== undefined) {
+    window.clearTimeout(stopTimer);
+    playbackStopTimers.delete(audio);
+  }
+
   audio.currentTime = 0;
   audio.volume = options?.volume ?? defaultVolumes[name];
 
   void audio.play().catch(() => {
     // Ignore browser autoplay rejections until the user interacts.
   });
+
+  if (options?.durationMs !== undefined) {
+    const timer = window.setTimeout(() => {
+      audio.pause();
+      audio.currentTime = 0;
+      playbackStopTimers.delete(audio);
+    }, options.durationMs);
+
+    playbackStopTimers.set(audio, timer);
+  }
 }

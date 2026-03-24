@@ -1,8 +1,37 @@
 import { useReducer, useCallback, useEffect, useRef } from 'react';
-import { type GameState, UNDO_COST, SHUFFLE_COST, ADD_VIAL_COST } from '../game/types';
+import { type GameState, UNDO_COST, SHUFFLE_COST, ADD_VIAL_COST, VIAL_CAPACITY } from '../game/types';
 import { pour, undo, shuffleVial, addEmptyVial, calculateReward } from '../game/engine';
 import { createGameState, getSavedLevel, saveLevel, saveCoins, clearSave } from '../game/levels';
 import { useSoundEffects } from './useSoundEffects';
+
+const POUR_SOUND_BASE_MS = 120;
+const POUR_SOUND_PER_SEGMENT_MS = 130;
+
+function getPourSoundDuration(segmentCount: number): number {
+  return POUR_SOUND_BASE_MS + segmentCount * POUR_SOUND_PER_SEGMENT_MS;
+}
+
+function shouldPlayPickupOnClick(state: GameState, index: number): boolean {
+  if (state.won) return false;
+
+  if (state.selectedVial === null) {
+    return state.vials[index].length > 0;
+  }
+
+  if (state.selectedVial === index) {
+    return false;
+  }
+
+  return state.vials[index].length > 0 && !pour(state, state.selectedVial, index);
+}
+
+function isCompletedVial(vial: GameState['vials'][number], hidden: boolean[] = []): boolean {
+  return (
+    vial.length === VIAL_CAPACITY &&
+    vial.every((color) => color === vial[0]) &&
+    !hidden.some((isHidden) => isHidden)
+  );
+}
 
 type Action =
   | { type: 'SELECT_VIAL'; index: number }
@@ -117,10 +146,30 @@ export function useGame() {
 
   const selectVial = useCallback(
     (index: number) => {
-      const nextState = reducer(state, { type: 'SELECT_VIAL', index });
-
-      if (nextState !== state && nextState.selectedVial !== null) {
+      if (shouldPlayPickupOnClick(state, index)) {
         play('pickupVial');
+      }
+
+      const nextState = reducer(state, { type: 'SELECT_VIAL', index });
+      const lastMove = nextState.moveHistory[nextState.moveHistory.length - 1];
+      const moveCountIncreased = nextState.moveHistory.length > state.moveHistory.length;
+
+      if (moveCountIncreased && lastMove) {
+        play('pour', { durationMs: getPourSoundDuration(lastMove.count) });
+
+        const targetIndex = lastMove.to;
+        const wasComplete = isCompletedVial(
+          state.vials[targetIndex],
+          state.hidden[targetIndex] ?? []
+        );
+        const isNowComplete = isCompletedVial(
+          nextState.vials[targetIndex],
+          nextState.hidden[targetIndex] ?? []
+        );
+
+        if (!wasComplete && isNowComplete) {
+          play('vialFull');
+        }
       }
 
       dispatch({ type: 'SELECT_VIAL', index });
