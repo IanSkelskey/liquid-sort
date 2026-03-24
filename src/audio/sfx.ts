@@ -1,10 +1,12 @@
-export type SoundEffectName = 'pickupVial' | 'levelComplete' | 'pour' | 'vialFull';
+export type SoundEffectName = 'pickupVial' | 'levelComplete' | 'pour' | 'vialFull' | 'addVial' | 'popUp';
 
 const soundEffectSources: Record<SoundEffectName, string> = {
-  pickupVial: new URL('../../assets/pickup_vial.wav', import.meta.url).href,
+  pickupVial: new URL('../../assets/glass_clink.mp3', import.meta.url).href,
   levelComplete: new URL('../../assets/level_complete.mp3', import.meta.url).href,
   pour: new URL('../../assets/bubble.mp3', import.meta.url).href,
   vialFull: new URL('../../assets/vial_full.mp3', import.meta.url).href,
+  addVial: new URL('../../assets/glass_clink_2.mp3', import.meta.url).href,
+  popUp: new URL('../../assets/pop_up.mp3', import.meta.url).href,
 };
 
 const defaultVolumes: Record<SoundEffectName, number> = {
@@ -12,6 +14,8 @@ const defaultVolumes: Record<SoundEffectName, number> = {
   levelComplete: 0.6,
   pour: 0.4,
   vialFull: 0.5,
+  addVial: 0.5,
+  popUp: 0.5,
 };
 
 const soundPools = new Map<SoundEffectName, HTMLAudioElement[]>();

@@ -135,6 +135,7 @@ export function useGame() {
   );
   const { play } = useSoundEffects();
   const previousWonRef = useRef(state.won);
+  const previousAddedVialRef = useRef(state.addedVial);
 
   useEffect(() => {
     if (!previousWonRef.current && state.won) {
@@ -143,6 +144,15 @@ export function useGame() {
 
     previousWonRef.current = state.won;
   }, [play, state.won]);
+
+  useEffect(() => {
+    if (!previousAddedVialRef.current && state.addedVial) {
+      play('addVial');
+      play('popUp');
+    }
+
+    previousAddedVialRef.current = state.addedVial;
+  }, [play, state.addedVial]);
 
   const selectVial = useCallback(
     (index: number) => {
