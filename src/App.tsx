@@ -6,14 +6,18 @@ import { GameBoard } from './components/GameBoard';
 import { WinModal } from './components/WinModal';
 import { ConfirmModal } from './components/ConfirmModal';
 import { UNDO_COST, SHUFFLE_COST, ADD_VIAL_COST } from './game/types';
-import { calculateReward, hasMovesLeft } from './game/engine';
+import { calculateReward } from './game/engine';
+import { MoveDebugPanel } from './debug/MoveDebugPanel';
+import { useMoveDebug } from './debug/useMoveDebug';
 
 function App() {
   const { state, selectVial, undoMove, restart, nextLevel, shuffleSelected, addVial, resetGame } = useGame();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
+  const { moveAnalysis, movesRemaining, totalCandidates, validMovePreview, skipSummary } = useMoveDebug(state);
+
   const coinsEarned = state.won ? calculateReward(state.level, state.moveCount) : 0;
-  const stuck = !state.won && state.moveHistory.length > 0 && !hasMovesLeft(state);
+  const stuck = !state.won && state.moveHistory.length > 0 && !moveAnalysis.hasMovesLeft;
 
   return (
     <div className="app">
@@ -72,6 +76,14 @@ function App() {
         onCancel={undoMove}
         cancelLabel={state.coins >= UNDO_COST ? `↩ Undo (${UNDO_COST}🪙)` : undefined}
         icon="😵"
+      />
+
+      <MoveDebugPanel
+        moveAnalysis={moveAnalysis}
+        movesRemaining={movesRemaining}
+        totalCandidates={totalCandidates}
+        validMovePreview={validMovePreview}
+        skipSummary={skipSummary}
       />
     </div>
   );
