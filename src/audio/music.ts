@@ -12,11 +12,12 @@ function getAudio(): HTMLAudioElement {
   return audio;
 }
 
-export function playMusic(): void {
+export function playMusic(): Promise<boolean> {
   const a = getAudio();
   if (a.paused) {
-    void a.play().catch(() => {});
+    return a.play().then(() => true).catch(() => false);
   }
+  return Promise.resolve(true);
 }
 
 export function pauseMusic(): void {

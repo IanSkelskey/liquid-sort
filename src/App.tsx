@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useGame } from './hooks/useGame';
 import { Header } from './components/Header';
 import { Toolbar } from './components/Toolbar';
@@ -17,17 +17,17 @@ function App() {
 
   // Start background music on first user interaction
   const [musicStarted, setMusicStarted] = useState(false);
-  const startMusic = useCallback(() => {
-    if (!musicStarted) {
-      playMusic();
-      setMusicStarted(true);
-    }
-  }, [musicStarted]);
 
   useEffect(() => {
-    document.addEventListener('pointerdown', startMusic, { once: true });
-    return () => document.removeEventListener('pointerdown', startMusic);
-  }, [startMusic]);
+    if (musicStarted) return;
+    const handler = () => {
+      void playMusic().then((ok) => {
+        if (ok) setMusicStarted(true);
+      });
+    };
+    document.addEventListener('pointerdown', handler);
+    return () => document.removeEventListener('pointerdown', handler);
+  }, [musicStarted]);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   const { moveAnalysis, movesRemaining, totalCandidates, validMovePreview, skipSummary } = useMoveDebug(state);
