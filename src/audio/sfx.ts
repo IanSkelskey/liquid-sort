@@ -1,4 +1,4 @@
-export type SoundEffectName = 'pickupVial' | 'levelComplete' | 'pour' | 'vialFull' | 'addVial' | 'popUp';
+export type SoundEffectName = 'pickupVial' | 'levelComplete' | 'pour' | 'vialFull' | 'addVial' | 'popUp' | 'reveal';
 
 const soundEffectSources: Record<SoundEffectName, string> = {
   pickupVial: new URL('../../assets/sound/glass_clink.mp3', import.meta.url).href,
@@ -7,6 +7,7 @@ const soundEffectSources: Record<SoundEffectName, string> = {
   vialFull: new URL('../../assets/sound/vial_full.mp3', import.meta.url).href,
   addVial: new URL('../../assets/sound/glass_clink_2.mp3', import.meta.url).href,
   popUp: new URL('../../assets/sound/pop_up.mp3', import.meta.url).href,
+  reveal: new URL('../../assets/sound/reveal.mp3', import.meta.url).href,
 };
 
 const defaultVolumes: Record<SoundEffectName, number> = {
@@ -16,6 +17,7 @@ const defaultVolumes: Record<SoundEffectName, number> = {
   vialFull: 0.5,
   addVial: 0.5,
   popUp: 0.5,
+  reveal: 0.5,
 };
 
 let sfxMasterVolume = 1;

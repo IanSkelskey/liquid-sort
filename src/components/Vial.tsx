@@ -1,5 +1,7 @@
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { type Vial as VialType, COLOR_VALUES, VIAL_CAPACITY } from '../game/types';
+import { playSoundEffect } from '../audio/sfx';
 
 interface VialProps {
   vial: VialType;
@@ -18,6 +20,27 @@ const INNER_X = (VIAL_WIDTH - INNER_WIDTH) / 2;
 const CORNER_RADIUS = 10;
 
 export function Vial({ vial, hiddenMask, isSelected, onClick, isComplete }: VialProps) {
+  const prevHiddenRef = useRef(hiddenMask);
+  const [revealedIndices, setRevealedIndices] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    const prev = prevHiddenRef.current;
+    const justRevealed = new Set<number>();
+    for (let i = 0; i < vial.length; i++) {
+      if (prev[i] && !hiddenMask[i]) {
+        justRevealed.add(i);
+      }
+    }
+    if (justRevealed.size > 0) {
+      setRevealedIndices(justRevealed);
+      playSoundEffect('reveal');
+      const timer = setTimeout(() => setRevealedIndices(new Set()), 500);
+      prevHiddenRef.current = hiddenMask;
+      return () => clearTimeout(timer);
+    }
+    prevHiddenRef.current = hiddenMask;
+  }, [hiddenMask, vial.length]);
+
   return (
     <motion.div
       onClick={onClick}
@@ -73,6 +96,7 @@ export function Vial({ vial, hiddenMask, isSelected, onClick, isComplete }: Vial
           const isBottomSegment = i === 0;
           const isTopSegment = i === vial.length - 1;
           const isHidden = hiddenMask[i] ?? false;
+          const justRevealed = revealedIndices.has(i);
           const fillColor = isHidden ? '#888888' : COLOR_VALUES[color];
 
           return (
@@ -105,6 +129,22 @@ export function Vial({ vial, hiddenMask, isSelected, onClick, isComplete }: Vial
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: i * 0.03 }}
+                />
+              )}
+              {/* Reveal flash overlay */}
+              {justRevealed && (
+                <motion.rect
+                  x={INNER_X}
+                  width={INNER_WIDTH}
+                  height={SEGMENT_HEIGHT}
+                  y={segY}
+                  fill="white"
+                  initial={{ opacity: 0.6 }}
+                  animate={{ opacity: 0 }}
+                  transition={{ duration: 0.45, ease: 'easeOut' }}
+                  rx={i === 0 ? CORNER_RADIUS : 0}
+                  ry={i === 0 ? CORNER_RADIUS : 0}
+                  style={{ pointerEvents: 'none' }}
                 />
               )}
               {/* Question mark for hidden segments */}
