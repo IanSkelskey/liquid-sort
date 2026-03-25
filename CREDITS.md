@@ -15,6 +15,8 @@ All credited sound effects below are from **Pixabay**, created by **floraphonic*
 | `level_complete.mp3` | [Pixabay](https://pixabay.com/sound-effects/film-special-effects-cute-level-up-3-189853/) | Cute Level Up 3 |
 | `pop_up.mp3` | [Pixabay](https://pixabay.com/sound-effects/film-special-effects-ui-pop-up-2-197887/) | UI Pop Up 2 |
 | `reveal.mp3` | [Pixabay](https://pixabay.com/sound-effects/film-special-effects-arcade-ui-6-229503/) | Arcade UI 6 |
+| `shuffle.mp3` | [Pixabay](https://pixabay.com/sound-effects/film-special-effects-marimba-bloop-1-188150/) | Marimba Bloop 1 |
+| `undo.mp3` | [Pixabay](https://pixabay.com/sound-effects/film-special-effects-bloop-4-186533/) | Bloop 4 |
 
 ## Music
 

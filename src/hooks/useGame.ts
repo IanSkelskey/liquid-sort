@@ -187,13 +187,19 @@ export function useGame() {
     [play, state]
   );
 
-  const undoMove = useCallback(() => dispatch({ type: 'UNDO' }), []);
+  const undoMove = useCallback(() => {
+    play('undo');
+    dispatch({ type: 'UNDO' });
+  }, [play]);
   const restart = useCallback(() => dispatch({ type: 'RESTART' }), []);
   const nextLevel = useCallback(() => dispatch({ type: 'NEXT_LEVEL' }), []);
 
   const shuffleSelected = useCallback(
-    (index: number) => dispatch({ type: 'SHUFFLE_VIAL', index }),
-    []
+    (index: number) => {
+      play('shuffle');
+      dispatch({ type: 'SHUFFLE_VIAL', index });
+    },
+    [play]
   );
 
   const addVial = useCallback(() => dispatch({ type: 'ADD_VIAL' }), []);
