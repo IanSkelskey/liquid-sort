@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useGame } from './hooks/useGame';
 import { Header } from './components/Header';
 import { Toolbar } from './components/Toolbar';
@@ -9,9 +9,25 @@ import { UNDO_COST, SHUFFLE_COST, ADD_VIAL_COST } from './game/types';
 import { calculateReward } from './game/engine';
 import { MoveDebugPanel } from './debug/MoveDebugPanel';
 import { useMoveDebug } from './debug/useMoveDebug';
+import { playMusic } from './audio/music';
+import { AudioControls } from './components/AudioControls';
 
 function App() {
   const { state, selectVial, undoMove, restart, nextLevel, shuffleSelected, addVial, resetGame } = useGame();
+
+  // Start background music on first user interaction
+  const [musicStarted, setMusicStarted] = useState(false);
+  const startMusic = useCallback(() => {
+    if (!musicStarted) {
+      playMusic();
+      setMusicStarted(true);
+    }
+  }, [musicStarted]);
+
+  useEffect(() => {
+    document.addEventListener('pointerdown', startMusic, { once: true });
+    return () => document.removeEventListener('pointerdown', startMusic);
+  }, [startMusic]);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   const { moveAnalysis, movesRemaining, totalCandidates, validMovePreview, skipSummary } = useMoveDebug(state);
@@ -85,6 +101,7 @@ function App() {
         validMovePreview={validMovePreview}
         skipSummary={skipSummary}
       />
+      <AudioControls />
     </div>
   );
 }

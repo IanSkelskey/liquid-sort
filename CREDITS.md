@@ -15,6 +15,12 @@ All credited sound effects below are from **Pixabay**, created by **floraphonic*
 | `level_complete.mp3` | [Pixabay](https://pixabay.com/sound-effects/film-special-effects-cute-level-up-3-189853/) | Cute Level Up 3 |
 | `pop_up.mp3` | [Pixabay](https://pixabay.com/sound-effects/film-special-effects-ui-pop-up-2-197887/) | UI Pop Up 2 |
 
+## Music
+
+| File | Source | Original Title |
+| --- | --- | --- |
+| `gameplay.opus` | [Living Game Audio](https://livinggameaudio.itch.io/free-cozy-game-sound-pack-1) | Free Cozy Game Sound Pack by Living Game Audio |
+
 ## Notes
 
 - If you add new third-party assets, please append them to this file in the same format.

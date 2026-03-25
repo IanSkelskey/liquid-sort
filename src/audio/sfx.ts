@@ -18,6 +18,25 @@ const defaultVolumes: Record<SoundEffectName, number> = {
   popUp: 0.5,
 };
 
+let sfxMasterVolume = 1;
+let sfxMuted = false;
+
+export function setSfxVolume(volume: number): void {
+  sfxMasterVolume = Math.max(0, Math.min(1, volume));
+}
+
+export function getSfxVolume(): number {
+  return sfxMasterVolume;
+}
+
+export function setSfxMuted(muted: boolean): void {
+  sfxMuted = muted;
+}
+
+export function isSfxMuted(): boolean {
+  return sfxMuted;
+}
+
 const soundPools = new Map<SoundEffectName, HTMLAudioElement[]>();
 const playbackStopTimers = new WeakMap<HTMLAudioElement, number>();
 
@@ -66,8 +85,10 @@ export function playSoundEffect(
     playbackStopTimers.delete(audio);
   }
 
+  if (sfxMuted) return;
+
   audio.currentTime = 0;
-  audio.volume = options?.volume ?? defaultVolumes[name];
+  audio.volume = (options?.volume ?? defaultVolumes[name]) * sfxMasterVolume;
 
   void audio.play().catch(() => {
     // Ignore browser autoplay rejections until the user interacts.
