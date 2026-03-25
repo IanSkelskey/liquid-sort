@@ -14,6 +14,7 @@ All credited sound effects below are from **Pixabay**, created by **floraphonic*
 | `bubble.mp3` | [Pixabay](https://pixabay.com/sound-effects/film-special-effects-bubbling-loop-1-169080/) | Bubbling Loop 1 |
 | `level_complete.mp3` | [Pixabay](https://pixabay.com/sound-effects/film-special-effects-cute-level-up-3-189853/) | Cute Level Up 3 |
 | `pop_up.mp3` | [Pixabay](https://pixabay.com/sound-effects/film-special-effects-ui-pop-up-2-197887/) | UI Pop Up 2 |
+| `reveal.mp3` | [Pixabay](https://pixabay.com/sound-effects/film-special-effects-arcade-ui-6-229503/) | Arcade UI 6 |
 
 ## Music
 
