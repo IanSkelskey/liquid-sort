@@ -1,7 +1,8 @@
-export type SoundEffectName = 'pickupVial' | 'levelComplete' | 'pour' | 'vialFull' | 'addVial' | 'popUp' | 'reveal' | 'shuffle' | 'undo';
+export type SoundEffectName = 'pickupVial' | 'putDownVial' | 'levelComplete' | 'pour' | 'vialFull' | 'addVial' | 'popUp' | 'reveal' | 'shuffle' | 'undo' | 'noMoves';
 
 const soundEffectSources: Record<SoundEffectName, string> = {
   pickupVial: new URL('../../assets/sound/glass_clink.mp3', import.meta.url).href,
+  putDownVial: new URL('../../assets/sound/glass_clink_3.mp3', import.meta.url).href,
   levelComplete: new URL('../../assets/sound/level_complete.mp3', import.meta.url).href,
   pour: new URL('../../assets/sound/bubble.mp3', import.meta.url).href,
   vialFull: new URL('../../assets/sound/vial_full.mp3', import.meta.url).href,
@@ -10,10 +11,12 @@ const soundEffectSources: Record<SoundEffectName, string> = {
   reveal: new URL('../../assets/sound/reveal.mp3', import.meta.url).href,
   shuffle: new URL('../../assets/sound/shuffle.mp3', import.meta.url).href,
   undo: new URL('../../assets/sound/undo.mp3', import.meta.url).href,
+  noMoves: new URL('../../assets/sound/no_moves.mp3', import.meta.url).href,
 };
 
 const defaultVolumes: Record<SoundEffectName, number> = {
   pickupVial: 0.45,
+  putDownVial: 0.45,
   levelComplete: 0.6,
   pour: 0.4,
   vialFull: 0.5,
@@ -22,6 +25,7 @@ const defaultVolumes: Record<SoundEffectName, number> = {
   reveal: 0.5,
   shuffle: 0.5,
   undo: 0.5,
+  noMoves: 0.5,
 };
 
 let sfxMasterVolume = 1;

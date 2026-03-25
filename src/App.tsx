@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useGame } from './hooks/useGame';
 import { Header } from './components/Header';
 import { Toolbar } from './components/Toolbar';
@@ -11,6 +11,7 @@ import { MoveDebugPanel } from './debug/MoveDebugPanel';
 import { useMoveDebug } from './debug/useMoveDebug';
 import { playMusic } from './audio/music';
 import { AudioControls } from './components/AudioControls';
+import { playSoundEffect } from './audio/sfx';
 
 function App() {
   const { state, selectVial, undoMove, restart, nextLevel, shuffleSelected, addVial, resetGame } = useGame();
@@ -34,6 +35,14 @@ function App() {
 
   const coinsEarned = state.won ? calculateReward(state.level, state.moveCount) : 0;
   const stuck = !state.won && state.moveHistory.length > 0 && !moveAnalysis.hasMovesLeft;
+
+  const prevStuckRef = useRef(stuck);
+  useEffect(() => {
+    if (stuck && !prevStuckRef.current) {
+      playSoundEffect('noMoves');
+    }
+    prevStuckRef.current = stuck;
+  }, [stuck]);
 
   return (
     <div className="app">

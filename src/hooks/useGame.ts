@@ -158,6 +158,8 @@ export function useGame() {
     (index: number) => {
       if (shouldPlayPickupOnClick(state, index)) {
         play('pickupVial');
+      } else if (state.selectedVial === index) {
+        play('putDownVial');
       }
 
       const nextState = reducer(state, { type: 'SELECT_VIAL', index });
