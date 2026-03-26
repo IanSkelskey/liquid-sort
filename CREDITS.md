@@ -4,8 +4,6 @@ Thank you to the creators whose work helps bring this project to life.
 
 ## Sound Effects
 
-All credited sound effects below are from **Pixabay**, created by **floraphonic**.
-
 | File | Source | Original Title |
 | --- | --- | --- |
 | `glass_clink.mp3` | [Pixabay](https://pixabay.com/sound-effects/film-special-effects-glass-clink-2-184006/) | Glass Clink 2 |
