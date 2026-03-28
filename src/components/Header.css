@@ -64,7 +64,7 @@
   box-shadow: var(--shadow-sm);
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .header-btn:hover:not(:disabled) {
@@ -83,6 +83,13 @@
 .header-btn:disabled {
   opacity: 0.35;
   cursor: not-allowed;
+}
+
+.header-btn-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex: 0 0 auto;
+  stroke-width: 2.2;
 }
 
 .header-btn--danger {

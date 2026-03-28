@@ -1,44 +1,13 @@
+import { CircleHelp, Heart, Play, Sparkles } from "lucide-react";
 import { COLOR_VALUES } from "../game/types";
 import { SceneBackground } from "./SceneBackground";
+import { Vial } from "./Vial";
 
 import './SplashScreen.css';
 
 type SplashScreenProps = {
     onStart: () => void;
     onHowToPlay?: () => void;
-}
-
-function DecorativeVial({ colors }: { colors: string[] }) {
-    const mergedColors = colors.reduce<Array<{ color: string; count: number }>>((runs, color) => {
-        const lastRun = runs[runs.length - 1];
-
-        if (lastRun && lastRun.color === color) {
-            lastRun.count += 1;
-            return runs;
-        }
-
-        runs.push({ color, count: 1 });
-        return runs;
-    }, []);
-
-    return (
-        <div className="splash-vial">
-            <div className="splash-vial-rim" />
-            <div className="splash-vial-glass">
-                {mergedColors.map(({ color, count }, index) => (
-                    <div
-                        key={`${color}-${index}-${count}`}
-                        className="splash-liquid-layer"
-                        style={{
-                            backgroundColor: color,
-                            height: `${count * 25}%`,
-                        }}
-                    />
-                ))}
-                <div className="splash-vial-shine" />
-            </div>
-        </div>
-    );
 }
 
 export default function SplashScreen({
@@ -49,28 +18,47 @@ export default function SplashScreen({
         <SceneBackground variant="splash">
             <div className="splash-screen">
                 <div className="splash-content">
-                    <div className="splash-badge">{"\u2728"} Alchemical Puzzle Game</div>
+                    <div className="splash-badge">
+                        <Sparkles className="splash-badge-icon" aria-hidden="true" />
+                        <span>Alchemical Puzzle Game</span>
+                    </div>
                     <h1 className="splash-title">
                         <span className="splash-title-liquid">Liquid</span>
                         <span className="splash-title-sort">Sort</span>
                     </h1>
                     <div className="splash-vial-row" aria-hidden="true">
                         {Object.values(COLOR_VALUES).slice(0, 5).map((color, index) => (
-                            <DecorativeVial key={index} colors={[color, color, color]} />
+                            <Vial
+                                key={index}
+                                variant="splash"
+                                segments={[color, color, color]}
+                            />
                         ))}
                     </div>
 
                     <div className="splash-actions">
-                        <button className="splash-btn splash-btn-primary" onClick={onStart}>{"\u25B6"} Play</button>
+                        <button className="splash-btn splash-btn-primary" onClick={onStart}>
+                            <span className="splash-btn-icon" aria-hidden="true">
+                                <Play fill="currentColor" />
+                            </span>
+                            <span className="splash-btn-label">Play</span>
+                        </button>
                         {onHowToPlay && (
-                            <button className="splash-btn splash-btn-secondary" onClick={onHowToPlay}>{"\u2754"} How to Play</button>
+                            <button className="splash-btn splash-btn-secondary" onClick={onHowToPlay}>
+                                <span className="splash-btn-icon" aria-hidden="true">
+                                    <CircleHelp />
+                                </span>
+                                <span className="splash-btn-label">How to Play</span>
+                            </button>
                         )}
                     </div>
 
                     <div className="splash-footer">
                         <span className="splash-footer-text">
                             <span className="splash-footer-label">Made with</span>
-                            <span className="splash-footer-heart">{"\u2764\uFE0F"}</span>
+                            <span className="splash-footer-heart" aria-hidden="true">
+                                <Heart fill="currentColor" />
+                            </span>
                             <span className="splash-footer-label">by </span>
                             <a
                                 className="splash-footer-link"

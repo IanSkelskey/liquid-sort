@@ -1,5 +1,5 @@
 import { Vial } from './Vial';
-import { type GameState, VIAL_CAPACITY } from '../game/types';
+import { COLOR_VALUES, type GameState, VIAL_CAPACITY } from '../game/types';
 import './GameBoard.css';
 
 interface GameBoardProps {
@@ -21,7 +21,7 @@ export function GameBoard({ state, onSelectVial }: GameBoardProps) {
       {state.vials.map((vial, i) => (
         <Vial
           key={i}
-          vial={vial}
+          segments={vial.map((color) => COLOR_VALUES[color])}
           hiddenMask={state.hidden[i] ?? []}
           isSelected={state.selectedVial === i}
           isComplete={isVialComplete(vial, state.hidden[i] ?? [])}

@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { Volume2, VolumeX } from 'lucide-react';
 import { setMusicVolume, getMusicVolume, setMusicMuted } from '../audio/music';
 import { setSfxVolume, getSfxVolume, setSfxMuted } from '../audio/sfx';
 import './AudioControls.css';
@@ -29,14 +30,15 @@ export function AudioControls() {
     setSfxMuted(next);
   }, [muted]);
 
-  // Close panel when clicking outside
   useEffect(() => {
     if (!open) return;
+
     function handleClick(e: MouseEvent) {
       if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
         setOpen(false);
       }
     }
+
     document.addEventListener('pointerdown', handleClick);
     return () => document.removeEventListener('pointerdown', handleClick);
   }, [open]);
@@ -51,7 +53,12 @@ export function AudioControls() {
               className={`audio-mute-btn ${muted ? 'audio-mute-btn--active' : ''}`}
               onClick={toggleMute}
             >
-              {muted ? 'Unmute' : 'Mute All'}
+              {muted ? (
+                <Volume2 className="audio-mute-btn-icon" aria-hidden="true" />
+              ) : (
+                <VolumeX className="audio-mute-btn-icon" aria-hidden="true" />
+              )}
+              <span>{muted ? 'Unmute' : 'Mute All'}</span>
             </button>
           </div>
           <div className="audio-slider-group">
@@ -90,8 +97,13 @@ export function AudioControls() {
         className={`audio-toggle ${muted ? 'audio-toggle--muted' : ''}`}
         onClick={() => setOpen((o) => !o)}
         title="Audio settings"
+        aria-label={muted ? 'Audio settings, audio muted' : 'Audio settings'}
       >
-        {muted ? '🔇' : '🔊'}
+        {muted ? (
+          <VolumeX className="audio-toggle-icon" aria-hidden="true" />
+        ) : (
+          <Volume2 className="audio-toggle-icon" aria-hidden="true" />
+        )}
       </button>
     </div>
   );

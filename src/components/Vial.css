@@ -1,0 +1,102 @@
+.vial {
+  --vial-width: 52px;
+  --vial-height: 160px;
+  --vial-focus-ring: rgba(113, 173, 255, 0.34);
+  --vial-rim-top: #dff4ff;
+  --vial-rim-bottom: #8db8ff;
+  --vial-rim-stroke: rgba(160, 205, 255, 0.52);
+  --vial-glass-top: rgba(255, 255, 255, 0.18);
+  --vial-glass-bottom: rgba(190, 215, 255, 0.06);
+  --vial-glass-shadow: rgba(0, 0, 0, 0.24);
+  --vial-outline: var(--vial-stroke, rgba(145, 186, 255, 0.72));
+  --vial-outline-selected: var(--vial-stroke-selected, #60a5fa);
+  --vial-liquid-divider: rgba(255, 255, 255, 0.16);
+  --vial-liquid-highlight-strong: rgba(255, 255, 255, 0.28);
+  --vial-liquid-highlight-soft: rgba(255, 255, 255, 0.03);
+  --vial-shine-top: rgba(255, 255, 255, 0.82);
+  --vial-shine-bottom: rgba(255, 255, 255, 0.1);
+  --vial-hidden-fill: rgba(136, 140, 161, 0.94);
+  --vial-hidden-icon: rgba(255, 255, 255, 0.82);
+  position: relative;
+  width: var(--vial-width);
+  height: var(--vial-height);
+  display: inline-flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex: 0 0 auto;
+  overflow: visible;
+  transform-origin: center bottom;
+  outline: none;
+}
+
+.vial--splash {
+  --vial-width: 74px;
+  --vial-height: 196px;
+  --vial-glass-shadow: rgba(0, 0, 0, 0.22);
+}
+
+.vial--interactive {
+  cursor: pointer;
+}
+
+.vial:focus-visible {
+  outline: 3px solid var(--vial-focus-ring);
+  outline-offset: 4px;
+}
+
+.vial__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.vial__complete-badge {
+  position: absolute;
+  left: 50%;
+  bottom: -14px;
+  width: 19px;
+  height: 19px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateX(-50%);
+  color: #ffffff;
+  box-shadow:
+    0 10px 18px rgba(0, 0, 0, 0.22),
+    0 0 0 3px rgba(255, 255, 255, 0.14);
+}
+
+.vial__complete-badge svg {
+  width: 11px;
+  height: 11px;
+  stroke-width: 3;
+}
+
+@media (prefers-color-scheme: light) {
+  .vial {
+    --vial-focus-ring: rgba(95, 130, 191, 0.24);
+    --vial-rim-top: #ffffff;
+    --vial-rim-bottom: #c2d8ff;
+    --vial-rim-stroke: rgba(122, 166, 236, 0.52);
+    --vial-glass-top: rgba(255, 255, 255, 0.8);
+    --vial-glass-bottom: rgba(216, 232, 255, 0.34);
+    --vial-glass-shadow: rgba(97, 151, 220, 0.18);
+    --vial-outline: rgba(109, 152, 228, 0.76);
+    --vial-outline-selected: var(--vial-stroke-selected, #4b8ef7);
+    --vial-liquid-divider: rgba(255, 255, 255, 0.24);
+    --vial-liquid-highlight-strong: rgba(255, 255, 255, 0.34);
+    --vial-liquid-highlight-soft: rgba(255, 255, 255, 0.06);
+    --vial-shine-top: rgba(255, 255, 255, 0.95);
+    --vial-shine-bottom: rgba(255, 255, 255, 0.18);
+    --vial-hidden-fill: rgba(150, 160, 182, 0.9);
+    --vial-hidden-icon: rgba(255, 255, 255, 0.92);
+  }
+
+  .vial__complete-badge {
+    box-shadow:
+      0 10px 18px rgba(97, 151, 220, 0.22),
+      0 0 0 3px rgba(255, 255, 255, 0.42);
+  }
+}

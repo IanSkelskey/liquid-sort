@@ -1,34 +1,31 @@
 .splash-screen {
   --splash-screen-padding-inline: clamp(12px, 4vw, 20px);
   --splash-screen-padding-block: clamp(14px, 4vh, 32px);
-  --splash-vial-width: clamp(58px, 10vw, 74px);
+  --splash-vial-width: clamp(60px, 10.4vw, 78px);
   --splash-vial-height: clamp(152px, 23vh, 196px);
-  --splash-rim-width: clamp(46px, 8vw, 58px);
-  --splash-rim-height: clamp(8px, 1.4vh, 10px);
-  --splash-glass-width: clamp(42px, 7.2vw, 54px);
-  --splash-glass-height: calc(var(--splash-vial-height) - 18px);
-  --splash-glass-top: clamp(5px, 0.9vh, 6px);
-  --splash-glass-padding-top: clamp(8px, 1.4vh, 10px);
-  --splash-glass-padding-inline: clamp(4px, 0.9vw, 6px);
-  --splash-glass-padding-bottom: clamp(4px, 0.8vh, 6px);
   --splash-title-to-vials-gap: clamp(28px, 4.8vh, 40px);
   --splash-vial-gap: clamp(8px, 2.5vw, 16px);
   --splash-action-gap: clamp(10px, 2.5vw, 14px);
   --splash-text-color: #ffffff;
-  --splash-rim-gradient: linear-gradient(180deg, #dff4ff, #8db8ff);
-  --splash-rim-outline: rgba(160, 205, 255, 0.45);
-  --splash-rim-shadow: rgba(0, 0, 0, 0.2);
-  --splash-glass-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(190, 215, 255, 0.06));
-  --splash-glass-border: rgba(145, 186, 255, 0.72);
-  --splash-glass-inset-shadow: rgba(255, 255, 255, 0.12);
-  --splash-glass-shadow: rgba(0, 0, 0, 0.22);
-  --splash-liquid-divider: rgba(255, 255, 255, 0.16);
-  --splash-liquid-highlight: rgba(255, 255, 255, 0.12);
-  --splash-shine-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.1));
-  --splash-neutral-btn-bg: rgba(255, 255, 255, 0.48);
-  --splash-neutral-btn-bg-hover: rgba(255, 255, 255, 0.58);
-  --splash-neutral-btn-text: #ffffff;
-  --splash-neutral-btn-shadow: rgba(0, 0, 0, 0.18);
+  --splash-btn-focus: rgba(130, 198, 255, 0.34);
+  --splash-btn-highlight: rgba(255, 255, 255, 0.22);
+  --splash-btn-ambient-glow: rgba(255, 255, 255, 0.22);
+  --splash-primary-btn-bg:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 48%),
+    linear-gradient(135deg, #8dffbc 0%, #4ee58d 42%, #1aa85b 100%);
+  --splash-primary-btn-border: rgba(218, 255, 231, 0.42);
+  --splash-primary-btn-text: #082315;
+  --splash-primary-btn-shadow: rgba(28, 192, 102, 0.34);
+  --splash-primary-btn-icon-bg: rgba(255, 255, 255, 0.24);
+  --splash-primary-btn-icon-color: #0d341f;
+  --splash-secondary-btn-bg:
+    linear-gradient(135deg, rgba(92, 142, 255, 0.24), rgba(165, 115, 255, 0.18)),
+    linear-gradient(180deg, rgba(21, 29, 58, 0.96), rgba(39, 50, 82, 0.88));
+  --splash-secondary-btn-border: rgba(162, 191, 255, 0.3);
+  --splash-secondary-btn-text: #f2f7ff;
+  --splash-secondary-btn-shadow: rgba(4, 10, 28, 0.32);
+  --splash-secondary-btn-icon-bg: rgba(128, 165, 255, 0.18);
+  --splash-secondary-btn-icon-color: #dfeaff;
   --splash-badge-text: #d7e5ff;
   --splash-badge-bg: rgba(114, 137, 255, 0.14);
   --splash-badge-border: rgba(142, 164, 255, 0.2);
@@ -75,70 +72,9 @@
   flex-wrap: nowrap;
 }
 
-.splash-vial {
-  position: relative;
-  width: var(--splash-vial-width);
-  height: var(--splash-vial-height);
-  display: flex;
-  justify-content: center;
-  flex: 0 0 auto;
-}
-
-.splash-vial-rim {
-  position: absolute;
-  top: 0;
-  width: var(--splash-rim-width);
-  height: var(--splash-rim-height);
-  border-radius: 999px;
-  background: var(--splash-rim-gradient);
-  box-shadow:
-    0 0 0 2px var(--splash-rim-outline),
-    0 2px 6px var(--splash-rim-shadow);
-  z-index: 3;
-}
-
-.splash-vial-glass {
-  position: absolute;
-  top: var(--splash-glass-top);
-  width: var(--splash-glass-width);
-  height: var(--splash-glass-height);
-  border-radius: 0 0 18px 18px;
-  padding:
-    var(--splash-glass-padding-top)
-    var(--splash-glass-padding-inline)
-    var(--splash-glass-padding-bottom);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  overflow: hidden;
-  background: var(--splash-glass-gradient);
-  border: 2px solid var(--splash-glass-border);
-  box-shadow:
-    inset 0 0 14px var(--splash-glass-inset-shadow),
-    0 10px 20px var(--splash-glass-shadow);
-}
-
-.splash-liquid-layer {
-  height: 25%;
-  border-top: 1px solid var(--splash-liquid-divider);
-  box-shadow: inset 0 8px 10px var(--splash-liquid-highlight);
-}
-
-.splash-liquid-layer:nth-last-child(1 of .splash-liquid-layer) {
-  border-bottom-left-radius: 14px;
-  border-bottom-right-radius: 14px;
-}
-
-.splash-vial-shine {
-  position: absolute;
-  top: calc(var(--splash-glass-top) + clamp(7px, 1.2vh, 9px));
-  left: clamp(5px, 1.2vw, 8px);
-  width: clamp(6px, 1.5vw, 8px);
-  height: calc(var(--splash-glass-height) * 0.64);
-  border-radius: 999px;
-  background: var(--splash-shine-gradient);
-  opacity: 0.8;
-  pointer-events: none;
+.splash-vial-row .vial--splash {
+  --vial-width: var(--splash-vial-width);
+  --vial-height: var(--splash-vial-height);
 }
 
 .splash-actions {
@@ -146,59 +82,163 @@
   display: flex;
   gap: var(--splash-action-gap);
   justify-content: center;
+  align-items: stretch;
   flex-wrap: wrap;
   width: min(100%, 620px);
 }
 
 .splash-btn {
   appearance: none;
-  border: none;
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.78rem;
+  min-height: clamp(54px, 7.8vh, 66px);
+  min-width: clamp(168px, 21vw, 220px);
+  border: 1px solid transparent;
   cursor: pointer;
-  border-radius: 18px;
-  padding: clamp(12px, 1.8vh, 14px) clamp(16px, 4vw, 22px);
-  font-size: clamp(0.92rem, 2.8vw, 1rem);
+  border-radius: 22px;
+  padding: clamp(12px, 1.8vh, 15px) clamp(18px, 4.4vw, 28px);
+  font-size: clamp(0.96rem, 2.8vw, 1.08rem);
   font-weight: 800;
   white-space: nowrap;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  backdrop-filter: blur(18px) saturate(145%);
   transition:
     transform 0.18s ease,
     box-shadow 0.18s ease,
     filter 0.18s ease,
-    background 0.18s ease;
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.splash-btn::before,
+.splash-btn::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.splash-btn::before {
+  inset: 1px 1px auto;
+  height: 48%;
+  border-radius: inherit;
+  background: linear-gradient(180deg, var(--splash-btn-highlight), rgba(255, 255, 255, 0));
+  opacity: 0.9;
+}
+
+.splash-btn::after {
+  inset: auto 18% -44%;
+  height: 86%;
+  border-radius: 999px;
+  background: radial-gradient(circle, var(--splash-btn-ambient-glow), transparent 72%);
+  opacity: 0.18;
+  transform: scale(0.92);
+}
+
+.splash-btn > * {
+  position: relative;
+  z-index: 1;
 }
 
 .splash-btn:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  filter: saturate(1.05);
+}
+
+.splash-btn:hover::after {
+  opacity: 0.3;
+  transform: scale(1);
 }
 
 .splash-btn:active {
   transform: translateY(0);
 }
 
+.splash-btn:focus-visible {
+  outline: 3px solid var(--splash-btn-focus);
+  outline-offset: 4px;
+}
+
+.splash-btn-icon {
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+}
+
+.splash-btn-icon svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  stroke-width: 2.3;
+}
+
+.splash-btn-label {
+  transform: translateY(0.01em);
+}
+
 .splash-btn-primary {
-  color: white;
-  background: linear-gradient(180deg, #6dff99 0%, #24c86a 100%);
+  color: var(--splash-primary-btn-text);
+  background: var(--splash-primary-btn-bg);
+  border-color: var(--splash-primary-btn-border);
   box-shadow:
-    0 10px 24px rgba(36, 200, 106, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    0 16px 28px var(--splash-primary-btn-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.26),
+    inset 0 -16px 26px rgba(7, 64, 34, 0.14);
+}
+
+.splash-btn-primary:hover {
+  box-shadow:
+    0 20px 34px rgba(28, 192, 102, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -16px 26px rgba(7, 64, 34, 0.16);
+}
+
+.splash-btn-primary .splash-btn-icon {
+  color: var(--splash-primary-btn-icon-color);
+  background: var(--splash-primary-btn-icon-bg);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.26),
+    0 8px 14px rgba(9, 72, 40, 0.12);
 }
 
 .splash-btn-secondary,
 .splash-btn-ghost {
-  color: var(--splash-neutral-btn-text);
-  background: var(--splash-neutral-btn-bg);
+  color: var(--splash-secondary-btn-text);
+  background: var(--splash-secondary-btn-bg);
+  border-color: var(--splash-secondary-btn-border);
   box-shadow:
-    0 10px 22px var(--splash-neutral-btn-shadow),
-    inset 0 1px 0 rgba(255, 255, 255, 0.24);
-  backdrop-filter: blur(12px);
+    0 16px 28px var(--splash-secondary-btn-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -16px 30px rgba(92, 132, 219, 0.12);
 }
 
 .splash-btn-secondary:hover,
 .splash-btn-ghost:hover {
-  background: var(--splash-neutral-btn-bg-hover);
+  box-shadow:
+    0 20px 34px rgba(7, 16, 39, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -16px 30px rgba(105, 144, 229, 0.16);
+}
+
+.splash-btn-secondary .splash-btn-icon,
+.splash-btn-ghost .splash-btn-icon {
+  color: var(--splash-secondary-btn-icon-color);
+  background: var(--splash-secondary-btn-icon-bg);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .splash-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
   margin-bottom: clamp(12px, 2vh, 18px);
   padding: clamp(6px, 1.1vh, 8px) clamp(10px, 3vw, 14px);
   border-radius: 999px;
@@ -208,6 +248,14 @@
   color: var(--splash-badge-text);
   background: var(--splash-badge-bg);
   border: 1px solid var(--splash-badge-border);
+}
+
+.splash-badge-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex: 0 0 auto;
+  color: #ffbf7a;
+  stroke-width: 2.15;
 }
 
 .splash-title {
@@ -254,9 +302,17 @@
 }
 
 .splash-footer-heart {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--splash-footer-heart);
-  font-size: 0.86em;
-  transform: translateY(-0.02em);
+  transform: translateY(-0.05em);
+}
+
+.splash-footer-heart svg {
+  width: 0.78rem;
+  height: 0.78rem;
+  stroke-width: 1.7;
 }
 
 .splash-footer-link {
@@ -286,20 +342,25 @@
 @media (prefers-color-scheme: light) {
   .splash-screen {
     --splash-text-color: #132033;
-    --splash-rim-gradient: linear-gradient(180deg, #ffffff, #c2d8ff);
-    --splash-rim-outline: rgba(122, 166, 236, 0.5);
-    --splash-rim-shadow: rgba(84, 114, 168, 0.16);
-    --splash-glass-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(216, 232, 255, 0.32));
-    --splash-glass-border: rgba(109, 152, 228, 0.72);
-    --splash-glass-inset-shadow: rgba(255, 255, 255, 0.45);
-    --splash-glass-shadow: rgba(87, 123, 180, 0.18);
-    --splash-liquid-divider: rgba(255, 255, 255, 0.22);
-    --splash-liquid-highlight: rgba(255, 255, 255, 0.16);
-    --splash-shine-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.18));
-    --splash-neutral-btn-bg: rgba(255, 255, 255, 0.72);
-    --splash-neutral-btn-bg-hover: rgba(255, 255, 255, 0.86);
-    --splash-neutral-btn-text: #27405d;
-    --splash-neutral-btn-shadow: rgba(117, 146, 189, 0.18);
+    --splash-btn-focus: rgba(95, 130, 191, 0.24);
+    --splash-btn-highlight: rgba(255, 255, 255, 0.3);
+    --splash-btn-ambient-glow: rgba(133, 166, 226, 0.28);
+    --splash-primary-btn-bg:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 48%),
+      linear-gradient(135deg, #9bffbf 0%, #53e48b 42%, #1ca45a 100%);
+    --splash-primary-btn-border: rgba(219, 255, 231, 0.58);
+    --splash-primary-btn-text: #082114;
+    --splash-primary-btn-shadow: rgba(45, 184, 108, 0.26);
+    --splash-primary-btn-icon-bg: rgba(255, 255, 255, 0.28);
+    --splash-primary-btn-icon-color: #0e3420;
+    --splash-secondary-btn-bg:
+      linear-gradient(135deg, rgba(125, 165, 255, 0.18), rgba(166, 124, 255, 0.12)),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(232, 240, 255, 0.74));
+    --splash-secondary-btn-border: rgba(118, 152, 210, 0.34);
+    --splash-secondary-btn-text: #284160;
+    --splash-secondary-btn-shadow: rgba(107, 142, 196, 0.2);
+    --splash-secondary-btn-icon-bg: rgba(113, 149, 216, 0.14);
+    --splash-secondary-btn-icon-color: #3d5b83;
     --splash-badge-text: #365074;
     --splash-badge-bg: rgba(128, 158, 255, 0.12);
     --splash-badge-border: rgba(120, 152, 230, 0.2);
@@ -350,13 +411,8 @@
 
 @media (max-width: 460px) {
   .splash-screen {
-    --splash-vial-width: clamp(44px, 11.5vw, 54px);
+    --splash-vial-width: clamp(46px, 11.8vw, 56px);
     --splash-vial-height: clamp(122px, 19vh, 146px);
-    --splash-rim-width: clamp(35px, 9vw, 42px);
-    --splash-glass-width: clamp(34px, 8.2vw, 40px);
-    --splash-glass-padding-top: 8px;
-    --splash-glass-padding-inline: 3px;
-    --splash-glass-padding-bottom: 4px;
     --splash-title-to-vials-gap: clamp(22px, 4.2vh, 30px);
     --splash-vial-gap: clamp(8px, 2.4vw, 10px);
     --splash-action-gap: 10px;
@@ -369,11 +425,8 @@
 
 @media (max-height: 820px) {
   .splash-screen {
-    --splash-vial-width: clamp(54px, 9.5vw, 70px);
+    --splash-vial-width: clamp(56px, 9.8vw, 72px);
     --splash-vial-height: clamp(140px, 20vh, 174px);
-    --splash-rim-width: clamp(42px, 7.6vw, 54px);
-    --splash-glass-width: clamp(38px, 6.8vw, 50px);
-    --splash-glass-padding-inline: clamp(3px, 0.8vw, 5px);
   }
 
   .splash-title {
@@ -383,11 +436,8 @@
 
 @media (max-height: 620px) {
   .splash-screen {
-    --splash-vial-width: 36px;
+    --splash-vial-width: 38px;
     --splash-vial-height: 88px;
-    --splash-rim-width: 28px;
-    --splash-rim-height: 7px;
-    --splash-glass-width: 26px;
     --splash-title-to-vials-gap: 14px;
     --splash-vial-gap: 6px;
     --splash-action-gap: 8px;

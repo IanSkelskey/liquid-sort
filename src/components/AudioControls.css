@@ -1,54 +1,73 @@
 .audio-controls {
+  --audio-surface: rgba(18, 22, 38, 0.84);
+  --audio-surface-hover: rgba(30, 37, 61, 0.92);
+  --audio-surface-strong: rgba(16, 21, 37, 0.92);
+  --audio-border: rgba(144, 175, 230, 0.22);
+  --audio-border-hover: rgba(170, 201, 255, 0.34);
+  --audio-icon: #dce9ff;
+  --audio-icon-muted: rgba(220, 233, 255, 0.56);
+  --audio-panel-shadow: rgba(0, 0, 0, 0.32);
   position: fixed;
-  bottom: 16px;
-  left: 16px;
+  bottom: 18px;
+  left: 18px;
   z-index: 100;
 }
 
 .audio-toggle {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 1.5px solid var(--border);
-  background: var(--bg-surface);
-  color: var(--text-secondary);
+  width: 48px;
+  height: 48px;
+  border-radius: 18px;
+  border: 1px solid var(--audio-border);
+  background: var(--audio-surface);
+  color: var(--audio-icon);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(18px) saturate(150%);
+  box-shadow:
+    0 14px 28px var(--audio-panel-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
   transition: all 0.2s ease;
-  font-size: 1.2rem;
   padding: 0;
 }
 
 .audio-toggle:hover {
-  background: var(--bg-surface-hover);
-  border-color: var(--border-hover);
-  color: var(--text-primary);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-lg);
+  background: var(--audio-surface-hover);
+  border-color: var(--audio-border-hover);
+  transform: translateY(-2px);
+  box-shadow:
+    0 18px 32px var(--audio-panel-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 .audio-toggle:active {
   transform: translateY(0) scale(0.95);
 }
 
+.audio-toggle-icon {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.15;
+}
+
 .audio-toggle--muted {
-  color: var(--text-muted);
-  opacity: 0.7;
+  color: var(--audio-icon-muted);
 }
 
 .audio-panel {
   position: absolute;
-  bottom: 52px;
+  bottom: 58px;
   left: 0;
-  background: var(--bg-surface);
-  border: 1.5px solid var(--border);
-  border-radius: 14px;
+  background: var(--audio-surface-strong);
+  border: 1px solid var(--audio-border);
+  border-radius: 18px;
   padding: 16px;
-  box-shadow: var(--shadow-lg);
-  min-width: 200px;
+  backdrop-filter: blur(24px) saturate(155%);
+  box-shadow:
+    0 18px 40px var(--audio-panel-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  min-width: 220px;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -75,25 +94,33 @@
 .audio-panel-title {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--audio-icon);
 }
 
 .audio-mute-btn {
-  padding: 4px 10px;
-  border-radius: 8px;
-  border: 1.5px solid var(--border);
-  background: var(--bg-surface);
-  color: var(--text-secondary);
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--audio-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--audio-icon);
   font-size: 0.7rem;
   font-weight: 600;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   transition: all 0.15s ease;
 }
 
 .audio-mute-btn:hover {
-  background: var(--bg-surface-hover);
-  border-color: var(--border-hover);
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--audio-border-hover);
+}
+
+.audio-mute-btn-icon {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.2;
 }
 
 .audio-mute-btn--active {
@@ -116,13 +143,13 @@
 .audio-slider-label {
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: rgba(220, 233, 255, 0.82);
   display: flex;
   justify-content: space-between;
 }
 
 .audio-slider-value {
-  color: var(--text-muted);
+  color: rgba(220, 233, 255, 0.58);
   font-weight: 500;
 }
 
@@ -163,4 +190,38 @@
   border: 2px solid var(--bg-surface);
   box-shadow: var(--shadow-sm);
   cursor: pointer;
+}
+
+@media (prefers-color-scheme: light) {
+  .audio-controls {
+    --audio-surface: rgba(255, 255, 255, 0.78);
+    --audio-surface-hover: rgba(255, 255, 255, 0.92);
+    --audio-surface-strong: rgba(250, 252, 255, 0.9);
+    --audio-border: rgba(123, 156, 214, 0.28);
+    --audio-border-hover: rgba(103, 137, 198, 0.42);
+    --audio-icon: #29415f;
+    --audio-icon-muted: rgba(41, 65, 95, 0.5);
+    --audio-panel-shadow: rgba(113, 145, 197, 0.24);
+  }
+
+  .audio-panel-title {
+    color: #203754;
+  }
+
+  .audio-mute-btn {
+    background: rgba(121, 158, 222, 0.08);
+    color: #29415f;
+  }
+
+  .audio-mute-btn:hover {
+    background: rgba(121, 158, 222, 0.14);
+  }
+
+  .audio-slider-label {
+    color: rgba(41, 65, 95, 0.82);
+  }
+
+  .audio-slider-value {
+    color: rgba(41, 65, 95, 0.56);
+  }
 }

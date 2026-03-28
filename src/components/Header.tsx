@@ -1,3 +1,4 @@
+import { RotateCcw, Trash2 } from 'lucide-react';
 import './Header.css';
 
 interface HeaderProps {
@@ -14,7 +15,7 @@ export function Header({ level, moveCount, onRestart, onResetGame }: HeaderProps
         <h1 className="header-title">Liquid Sort</h1>
         <div className="header-stats">
           <span className="header-level">Level {level}</span>
-          <span className="header-separator">·</span>
+          <span className="header-separator">{"\u00B7"}</span>
           <span className="header-moves">Moves: {moveCount}</span>
         </div>
       </div>
@@ -24,14 +25,16 @@ export function Header({ level, moveCount, onRestart, onResetGame }: HeaderProps
           onClick={onRestart}
           title="Restart level"
         >
-          ↻ Restart
+          <RotateCcw className="header-btn-icon" aria-hidden="true" />
+          <span>Restart</span>
         </button>
         <button
           className="header-btn header-btn--danger"
           onClick={onResetGame}
           title="Reset all progress"
         >
-          ✕ Reset
+          <Trash2 className="header-btn-icon" aria-hidden="true" />
+          <span>Reset</span>
         </button>
       </div>
     </header>
