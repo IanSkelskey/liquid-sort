@@ -35,6 +35,11 @@
   --splash-title-liquid-gradient: linear-gradient(180deg, #79e7ff 0%, #4db7ff 100%);
   --splash-title-sort-gradient: linear-gradient(180deg, #c89bff 0%, #8a6cff 100%);
   --splash-title-shadow: rgba(0, 0, 0, 0.4);
+  --splash-footer-text: rgba(215, 229, 255, 0.52);
+  --splash-footer-link: rgba(196, 211, 255, 0.76);
+  --splash-footer-link-hover: rgba(222, 232, 255, 0.9);
+  --splash-footer-link-underline: rgba(170, 192, 255, 0.28);
+  --splash-footer-heart: rgba(255, 141, 170, 0.72);
   position: relative;
   min-height: 100vh;
   min-height: 100dvh;
@@ -228,6 +233,56 @@
   background-clip: text;
 }
 
+.splash-footer {
+  margin-top: clamp(28px, 5.2vh, 42px);
+  display: flex;
+  justify-content: center;
+}
+
+.splash-footer-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: clamp(0.7rem, 1.8vw, 0.8rem);
+  line-height: 1;
+  letter-spacing: 0.015em;
+  color: var(--splash-footer-text);
+}
+
+.splash-footer-label {
+  opacity: 0.84;
+}
+
+.splash-footer-heart {
+  color: var(--splash-footer-heart);
+  font-size: 0.86em;
+  transform: translateY(-0.02em);
+}
+
+.splash-footer-link {
+  color: var(--splash-footer-link);
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--splash-footer-link-underline);
+  text-underline-offset: 0.18em;
+  font-weight: 600;
+  transition:
+    color 0.18s ease,
+    text-decoration-color 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.splash-footer-link:hover {
+  color: var(--splash-footer-link-hover);
+  text-decoration-color: currentColor;
+}
+
+.splash-footer-link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
 @media (prefers-color-scheme: light) {
   .splash-screen {
     --splash-text-color: #132033;
@@ -251,6 +306,11 @@
     --splash-title-liquid-gradient: linear-gradient(180deg, #48b8ea 0%, #2b84f2 100%);
     --splash-title-sort-gradient: linear-gradient(180deg, #8a7dff 0%, #7056f1 100%);
     --splash-title-shadow: rgba(138, 162, 201, 0.24);
+    --splash-footer-text: rgba(54, 80, 116, 0.58);
+    --splash-footer-link: rgba(73, 104, 150, 0.8);
+    --splash-footer-link-hover: rgba(39, 64, 93, 0.92);
+    --splash-footer-link-underline: rgba(104, 140, 194, 0.3);
+    --splash-footer-heart: rgba(214, 98, 131, 0.72);
   }
 }
 
@@ -275,6 +335,10 @@
   }
 
   .splash-btn-primary {
+    grid-column: 1 / -1;
+  }
+
+  .splash-actions > :nth-child(2):last-child {
     grid-column: 1 / -1;
   }
 
@@ -340,6 +404,14 @@
   .splash-actions {
     margin-top: 12px;
     width: min(100%, 360px);
+  }
+
+  .splash-footer {
+    margin-top: 14px;
+  }
+
+  .splash-footer-text {
+    font-size: 0.7rem;
   }
 
   .splash-btn {
