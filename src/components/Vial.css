@@ -13,8 +13,8 @@
   --vial-liquid-divider: rgba(255, 255, 255, 0.16);
   --vial-liquid-highlight-strong: rgba(255, 255, 255, 0.28);
   --vial-liquid-highlight-soft: rgba(255, 255, 255, 0.03);
-  --vial-shine-top: rgba(255, 255, 255, 0.82);
-  --vial-shine-bottom: rgba(255, 255, 255, 0.1);
+  --vial-shine-top: rgba(255, 255, 255, 0.75);
+  --vial-shine-bottom: rgba(255, 255, 255, 0.18);
   --vial-hidden-fill: rgba(136, 140, 161, 0.94);
   --vial-hidden-icon: rgba(255, 255, 255, 0.82);
   position: relative;
@@ -88,8 +88,8 @@
     --vial-liquid-divider: rgba(255, 255, 255, 0.24);
     --vial-liquid-highlight-strong: rgba(255, 255, 255, 0.34);
     --vial-liquid-highlight-soft: rgba(255, 255, 255, 0.06);
-    --vial-shine-top: rgba(255, 255, 255, 0.95);
-    --vial-shine-bottom: rgba(255, 255, 255, 0.18);
+    --vial-shine-top: rgba(255, 255, 255, 0.75);
+    --vial-shine-bottom: rgba(255, 255, 255, 0.28);
     --vial-hidden-fill: rgba(150, 160, 182, 0.9);
     --vial-hidden-icon: rgba(255, 255, 255, 0.92);
   }

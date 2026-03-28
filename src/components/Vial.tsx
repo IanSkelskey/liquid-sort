@@ -71,7 +71,7 @@ const VIAL_GEOMETRY: Record<VialVariant, VialGeometry> = {
     liquidRadius: 11,
     shineX: 14.2,
     shineY: 20,
-    shineWidth: 5.4,
+    shineWidth: 3,
     shineHeight: 90,
     glassGlowInset: 3,
   },
@@ -94,7 +94,7 @@ const VIAL_GEOMETRY: Record<VialVariant, VialGeometry> = {
     liquidRadius: 14,
     shineX: 20.5,
     shineY: 22,
-    shineWidth: 8.5,
+    shineWidth: 6,
     shineHeight: 116,
     glassGlowInset: 4,
   },
@@ -141,6 +141,17 @@ function buildBottomRoundedPath(x: number, y: number, width: number, height: num
     `Q ${right} ${bottom} ${right} ${bottom - radius}`,
     `L ${right} ${y}`,
     'Z',
+  ].join(' ');
+}
+
+function buildSideShinePath(geometry: VialGeometry) {
+  const x = geometry.shineX + geometry.shineWidth * 0.52;
+  const startY = geometry.shineY;
+  const endY = geometry.shineY + geometry.shineHeight;
+
+  return [
+    `M ${x} ${startY}`,
+    `L ${x} ${endY}`,
   ].join(' ');
 }
 
@@ -226,6 +237,7 @@ export function Vial({
     geometry.liquidHeight,
     geometry.liquidRadius,
   );
+  const shinePath = buildSideShinePath(geometry);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (!interactive) return;
@@ -283,8 +295,16 @@ export function Vial({
             <stop offset="0%" style={{ stopColor: 'var(--vial-rim-top)' }} />
             <stop offset="100%" style={{ stopColor: 'var(--vial-rim-bottom)' }} />
           </linearGradient>
-          <linearGradient id={shineGradientId} x1="0" y1="0" x2="0" y2="1">
+          <linearGradient
+            id={shineGradientId}
+            x1={geometry.shineX}
+            y1={geometry.shineY}
+            x2={geometry.shineX}
+            y2={geometry.shineY + geometry.shineHeight}
+            gradientUnits="userSpaceOnUse"
+          >
             <stop offset="0%" style={{ stopColor: 'var(--vial-shine-top)' }} />
+            <stop offset="28%" style={{ stopColor: 'var(--vial-shine-top)' }} />
             <stop offset="100%" style={{ stopColor: 'var(--vial-shine-bottom)' }} />
           </linearGradient>
           <linearGradient id={liquidGlossId} x1="0" y1="0" x2="1" y2="0">
@@ -472,14 +492,24 @@ export function Vial({
           opacity={0.8}
         />
 
-        <rect
-          x={geometry.shineX}
-          y={geometry.shineY}
-          width={geometry.shineWidth}
-          height={geometry.shineHeight}
-          rx={999}
-          fill={`url(#${shineGradientId})`}
-          opacity={0.84}
+        <path
+          d={shinePath}
+          fill="none"
+          stroke={`url(#${shineGradientId})`}
+          strokeWidth={variant === 'splash' ? geometry.shineWidth : geometry.shineWidth * 1.04}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          opacity={0.26}
+        />
+
+        <path
+          d={shinePath}
+          fill="none"
+          stroke={`url(#${shineGradientId})`}
+          strokeWidth={variant === 'splash' ? geometry.shineWidth * 0.52 : geometry.shineWidth * 0.58}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          opacity={0.92}
         />
       </svg>
 
