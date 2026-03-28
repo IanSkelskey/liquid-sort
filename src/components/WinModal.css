@@ -1,8 +1,37 @@
 .win-overlay {
+  --win-surface:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 26%),
+    linear-gradient(180deg, rgba(21, 27, 46, 0.96), rgba(13, 18, 33, 0.94));
+  --win-border: rgba(143, 175, 239, 0.18);
+  --win-shadow: rgba(0, 0, 0, 0.42);
+  --win-badge-bg: rgba(118, 138, 255, 0.14);
+  --win-badge-border: rgba(146, 172, 255, 0.18);
+  --win-badge-text: rgba(222, 232, 255, 0.86);
+  --win-badge-icon: #ffc870;
+  --win-title-gradient: linear-gradient(135deg, #79dfff 0%, #8ea7ff 52%, #b38cff 100%);
+  --win-stats: rgba(198, 211, 236, 0.7);
+  --win-stats-highlight: #f5f9ff;
+  --win-celebration-core:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 44%),
+    linear-gradient(135deg, #ffd978 0%, #f4b43f 100%);
+  --win-celebration-ring: rgba(255, 219, 135, 0.18);
+  --win-celebration-icon: #523100;
+  --win-reward-bg:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 45%),
+    linear-gradient(135deg, rgba(251, 191, 36, 0.22), rgba(245, 158, 11, 0.12));
+  --win-reward-border: rgba(251, 191, 36, 0.26);
+  --win-reward-label: rgba(255, 238, 197, 0.8);
+  --win-reward-value: #ffd36a;
+  --win-reward-icon-bg: rgba(255, 222, 124, 0.16);
+  --win-reward-icon: #ffc34d;
+  --win-btn-border: rgba(152, 186, 255, 0.28);
+  --win-btn-shadow: rgba(62, 125, 245, 0.26);
+  --win-btn-icon-bg: rgba(255, 255, 255, 0.2);
+  --win-btn-icon: #ffffff;
   position: fixed;
   inset: 0;
   background: var(--overlay);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -11,83 +40,317 @@
 }
 
 .win-modal {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 44px 48px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--win-surface);
+  border: 1px solid var(--win-border);
+  border-radius: 26px;
+  padding: 24px 26px 26px;
   text-align: center;
-  box-shadow: var(--shadow-lg);
+  box-shadow:
+    0 28px 70px var(--win-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(22px) saturate(145%);
   max-width: 360px;
   width: 100%;
 }
 
-.win-emoji {
-  font-size: 3.5rem;
+.win-modal > * {
+  position: relative;
+  z-index: 1;
+}
+
+.win-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 11px;
   margin-bottom: 12px;
 }
 
+.win-modal-glow {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(36px);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.win-modal-glow--blue {
+  width: 180px;
+  height: 180px;
+  top: -58px;
+  right: -40px;
+  background: rgba(78, 152, 255, 0.22);
+}
+
+.win-modal-glow--gold {
+  width: 160px;
+  height: 160px;
+  bottom: -62px;
+  left: -32px;
+  background: rgba(255, 191, 71, 0.18);
+}
+
+.win-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 6px 11px;
+  border-radius: 999px;
+  background: var(--win-badge-bg);
+  border: 1px solid var(--win-badge-border);
+  color: var(--win-badge-text);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.win-badge-icon {
+  width: 0.88rem;
+  height: 0.88rem;
+  color: var(--win-badge-icon);
+  stroke-width: 2.2;
+}
+
+.win-celebration {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.win-celebration-core {
+  width: 68px;
+  height: 68px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--win-celebration-core);
+  box-shadow:
+    0 12px 22px rgba(255, 184, 59, 0.14),
+    0 0 0 8px var(--win-celebration-ring),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.win-celebration-icon {
+  width: 1.68rem;
+  height: 1.68rem;
+  color: var(--win-celebration-icon);
+  stroke-width: 2.2;
+}
+
 .win-title {
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: -0.3px;
-  color: var(--text-primary);
-  margin: 0 0 6px;
+  font-size: clamp(1.4rem, 4vw, 1.72rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  margin: 0 0 7px;
+  background: var(--win-title-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .win-stats {
-  font-size: 0.95rem;
-  color: var(--text-muted);
+  font-size: 0.9rem;
+  color: var(--win-stats);
   margin: 0 0 16px;
-  font-weight: 500;
+  font-weight: 600;
+}
+
+.win-stats-highlight {
+  color: var(--win-stats-highlight);
+  font-weight: 800;
 }
 
 .win-reward {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.15));
-  border: 1.5px solid rgba(251, 191, 36, 0.3);
-  border-radius: 20px;
-  padding: 8px 20px;
-  margin-bottom: 24px;
+  gap: 10px;
+  background: var(--win-reward-bg);
+  border: 1px solid var(--win-reward-border);
+  border-radius: 18px;
+  padding: 8px 14px;
+  margin-bottom: 20px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 14px 28px rgba(0, 0, 0, 0.12);
 }
 
-.reward-label {
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: #f59e0b;
+.win-reward-icon-wrap {
+  width: 1.95rem;
+  height: 1.95rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--win-reward-icon-bg);
 }
 
-.reward-icon {
-  font-size: 1.1rem;
+.win-reward-icon {
+  width: 0.92rem;
+  height: 0.92rem;
+  color: var(--win-reward-icon);
+  stroke-width: 2.2;
+}
+
+.win-reward-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  line-height: 1.05;
+  gap: 3px;
+}
+
+.win-reward-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--win-reward-label);
+}
+
+.win-reward-value {
+  font-size: 1.08rem;
+  font-weight: 900;
+  color: var(--win-reward-value);
 }
 
 .win-btn {
-  padding: 14px 40px;
-  border: none;
-  border-radius: 14px;
-  background: var(--gradient-btn);
+  position: relative;
+  overflow: hidden;
+  padding: 13px 20px;
+  border: 1px solid var(--win-btn-border);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 46%),
+    var(--gradient-btn);
   color: #fff;
-  font-size: 1.05rem;
-  font-weight: 700;
+  font-size: 1rem;
+  font-weight: 800;
   cursor: pointer;
-  transition: all 0.2s ease;
-  min-height: 50px;
-  letter-spacing: 0.2px;
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+  min-height: 48px;
+  letter-spacing: 0.01em;
+  box-shadow:
+    0 16px 30px var(--win-btn-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.66rem;
+  min-width: 184px;
+}
+
+.win-btn::before {
+  content: "";
+  position: absolute;
+  inset: 1px 1px auto;
+  height: 48%;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
+
+.win-btn > * {
+  position: relative;
+  z-index: 1;
+}
+
+.win-btn-icon {
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--win-btn-icon-bg);
+  color: var(--win-btn-icon);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.win-btn-icon svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  stroke-width: 2.4;
 }
 
 .win-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+  filter: saturate(1.05);
+  box-shadow:
+    0 22px 34px rgba(77, 124, 245, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 .win-btn:active {
   transform: translateY(0) scale(0.97);
 }
 
+.win-btn:focus-visible {
+  outline: 3px solid rgba(131, 181, 255, 0.34);
+  outline-offset: 4px;
+}
+
+@media (prefers-color-scheme: light) {
+  .win-overlay {
+    --win-surface:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0) 24%),
+      linear-gradient(180deg, rgba(249, 252, 255, 0.95), rgba(234, 241, 255, 0.92));
+    --win-border: rgba(127, 156, 210, 0.26);
+    --win-shadow: rgba(113, 145, 197, 0.28);
+    --win-badge-bg: rgba(124, 149, 255, 0.12);
+    --win-badge-border: rgba(129, 157, 225, 0.2);
+    --win-badge-text: rgba(49, 78, 116, 0.84);
+    --win-title-gradient: linear-gradient(135deg, #3198e3 0%, #557bf3 52%, #8b67f4 100%);
+    --win-stats: rgba(52, 82, 120, 0.72);
+    --win-stats-highlight: #183250;
+    --win-celebration-core:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 44%),
+      linear-gradient(135deg, #ffe28e 0%, #f4ba49 100%);
+    --win-celebration-ring: rgba(255, 210, 101, 0.18);
+    --win-celebration-icon: #5d3a00;
+    --win-reward-bg:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0) 48%),
+      linear-gradient(135deg, rgba(251, 191, 36, 0.18), rgba(245, 158, 11, 0.08));
+    --win-reward-border: rgba(228, 173, 63, 0.24);
+    --win-reward-label: rgba(125, 95, 20, 0.78);
+    --win-reward-value: #ba7a00;
+    --win-reward-icon-bg: rgba(255, 211, 104, 0.18);
+    --win-reward-icon: #cc8c15;
+    --win-btn-border: rgba(114, 152, 219, 0.26);
+    --win-btn-shadow: rgba(90, 132, 219, 0.24);
+    background: rgba(226, 235, 251, 0.54);
+  }
+}
+
 @media (max-width: 480px) {
   .win-modal {
-    padding: 32px 24px;
+    padding: 22px 18px 22px;
+    border-radius: 24px;
+  }
+
+  .win-celebration-core {
+    width: 62px;
+    height: 62px;
+  }
+
+  .win-title {
+    font-size: 1.34rem;
+  }
+
+  .win-btn {
+    width: 100%;
+    min-width: 0;
   }
 }
