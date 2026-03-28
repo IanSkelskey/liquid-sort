@@ -52,16 +52,16 @@
 }
 
 .vial__complete-badge {
+  --vial-complete-badge-size: 19px;
   position: absolute;
-  left: 50%;
+  left: calc(50% - (var(--vial-complete-badge-size) / 2));
   bottom: -14px;
-  width: 19px;
-  height: 19px;
+  width: var(--vial-complete-badge-size);
+  height: var(--vial-complete-badge-size);
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transform: translateX(-50%);
   color: #ffffff;
   box-shadow:
     0 10px 18px rgba(0, 0, 0, 0.22),
