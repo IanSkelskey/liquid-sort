@@ -14,12 +14,58 @@
     --splash-title-to-vials-gap: clamp(28px, 4.8vh, 40px);
     --splash-vial-gap: clamp(8px, 2.5vw, 16px);
     --splash-action-gap: clamp(10px, 2.5vw, 14px);
+    --splash-text-color: #ffffff;
+    --splash-bg-top-glow: rgba(80, 100, 255, 0.14);
+    --splash-bg-bottom-glow: rgba(0, 210, 255, 0.12);
+    --splash-bg-main: linear-gradient(180deg, #090b17 0%, #070916 55%, #05070f 100%);
+    --splash-rim-gradient: linear-gradient(180deg, #dff4ff, #8db8ff);
+    --splash-rim-outline: rgba(160, 205, 255, 0.45);
+    --splash-rim-shadow: rgba(0, 0, 0, 0.2);
+    --splash-glass-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(190, 215, 255, 0.06));
+    --splash-glass-border: rgba(145, 186, 255, 0.72);
+    --splash-glass-inset-shadow: rgba(255, 255, 255, 0.12);
+    --splash-glass-shadow: rgba(0, 0, 0, 0.22);
+    --splash-liquid-divider: rgba(255, 255, 255, 0.16);
+    --splash-liquid-highlight: rgba(255, 255, 255, 0.12);
+    --splash-shine-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.1));
+    --splash-neutral-btn-bg: rgba(255, 255, 255, 0.48);
+    --splash-neutral-btn-bg-hover: rgba(255, 255, 255, 0.58);
+    --splash-neutral-btn-text: #ffffff;
+    --splash-neutral-btn-shadow: rgba(0, 0, 0, 0.18);
+    --splash-badge-text: #d7e5ff;
+    --splash-badge-bg: rgba(114, 137, 255, 0.14);
+    --splash-badge-border: rgba(142, 164, 255, 0.2);
+    --splash-title-liquid-gradient: linear-gradient(180deg, #79e7ff 0%, #4db7ff 100%);
+    --splash-title-sort-gradient: linear-gradient(180deg, #c89bff 0%, #8a6cff 100%);
+    --splash-title-shadow: rgba(0, 0, 0, 0.4);
+    --splash-bubble-gradient: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.75), rgba(167, 213, 255, 0.25) 35%, rgba(167, 213, 255, 0.08) 70%, rgba(167, 213, 255, 0.02) 100%);
+    --splash-bubble-border: rgba(180, 220, 255, 0.16);
+    --splash-bubble-inset: rgba(255, 255, 255, 0.12);
+    --splash-star-1: rgba(255, 255, 255, 0.8);
+    --splash-star-2: rgba(255, 255, 255, 0.65);
+    --splash-star-3: rgba(255, 255, 255, 0.45);
+    --splash-star-4: rgba(255, 255, 255, 0.55);
+    --splash-star-5: rgba(255, 255, 255, 0.55);
+    --splash-star-opacity: 0.45;
+    --splash-glow-1-color: rgba(0, 183, 255, 0.22);
+    --splash-glow-2-color: rgba(168, 85, 247, 0.18);
+    --splash-glow-3-color: rgba(34, 197, 94, 0.12);
+    --splash-atmosphere-overlay:
+      radial-gradient(circle at 18% 18%, rgba(79, 170, 255, 0.1), transparent 28%),
+      radial-gradient(circle at 82% 18%, rgba(157, 113, 255, 0.08), transparent 24%),
+      radial-gradient(circle at 50% 74%, rgba(72, 215, 177, 0.07), transparent 30%);
+    --splash-vignette-overlay: radial-gradient(circle at center, transparent 46%, rgba(0, 0, 0, 0.16) 100%);
+    --splash-glow-opacity: 0.5;
+    --splash-glow-blur: 60px;
+    --splash-bubble-shadow: rgba(255, 255, 255, 0.06);
+    color-scheme: dark;
     position: relative;
     min-height: 100vh;
     min-height: 100dvh;
     height: 100dvh;
     width: 100%;
     overflow: hidden;
+    isolation: isolate;
     display: grid;
     place-items: center;
     padding:
@@ -27,11 +73,28 @@
         var(--splash-screen-padding-inline)
         max(env(safe-area-inset-bottom), var(--splash-screen-padding-block));
     background:
-        radial-gradient(circle at top, rgba(80, 100, 255, 0.14), transparent 30%),
-        radial-gradient(circle at bottom left, rgba(0, 210, 255, 0.12), transparent 28%),
-        linear-gradient(180deg, #090b17 0%, #070916 55%, #05070f 100%);
-    color: white;
+        radial-gradient(circle at top, var(--splash-bg-top-glow), transparent 30%),
+        radial-gradient(circle at bottom left, var(--splash-bg-bottom-glow), transparent 28%),
+        var(--splash-bg-main);
+    color: var(--splash-text-color);
     font-family: Inter, system-ui, sans-serif;
+}
+
+.splash-screen::before,
+.splash-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.splash-screen::before {
+  background: var(--splash-atmosphere-overlay);
+}
+
+.splash-screen::after {
+  background: var(--splash-vignette-overlay);
 }
 
 .splash-content {
@@ -70,10 +133,10 @@
   width: var(--splash-rim-width);
   height: var(--splash-rim-height);
   border-radius: 999px;
-  background: linear-gradient(180deg, #dff4ff, #8db8ff);
+  background: var(--splash-rim-gradient);
   box-shadow:
-    0 0 0 2px rgba(160, 205, 255, 0.45),
-    0 2px 6px rgba(0, 0, 0, 0.2);
+    0 0 0 2px var(--splash-rim-outline),
+    0 2px 6px var(--splash-rim-shadow);
   z-index: 3;
 }
 
@@ -91,21 +154,17 @@
   flex-direction: column;
   justify-content: flex-end;
   overflow: hidden;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.18),
-    rgba(190, 215, 255, 0.06)
-  );
-  border: 2px solid rgba(145, 186, 255, 0.72);
+  background: var(--splash-glass-gradient);
+  border: 2px solid var(--splash-glass-border);
   box-shadow:
-    inset 0 0 14px rgba(255, 255, 255, 0.12),
-    0 10px 20px rgba(0, 0, 0, 0.22);
+    inset 0 0 14px var(--splash-glass-inset-shadow),
+    0 10px 20px var(--splash-glass-shadow);
 }
 
 .splash-liquid-layer {
   height: 25%;
-  border-top: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: inset 0 8px 10px rgba(255, 255, 255, 0.12);
+  border-top: 1px solid var(--splash-liquid-divider);
+  box-shadow: inset 0 8px 10px var(--splash-liquid-highlight);
 }
 
 .splash-liquid-layer:nth-last-child(1 of .splash-liquid-layer) {
@@ -120,11 +179,7 @@
   width: clamp(6px, 1.5vw, 8px);
   height: calc(var(--splash-glass-height) * 0.64);
   border-radius: 999px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.85),
-    rgba(255, 255, 255, 0.1)
-  );
+  background: var(--splash-shine-gradient);
   opacity: 0.8;
   pointer-events: none;
 }
@@ -170,11 +225,27 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
+.splash-btn-secondary,
+.splash-btn-ghost {
+  color: var(--splash-neutral-btn-text);
+  background: var(--splash-neutral-btn-bg);
+  box-shadow:
+    0 10px 22px var(--splash-neutral-btn-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  backdrop-filter: blur(12px);
+}
+
+.splash-btn-secondary:hover,
+.splash-btn-ghost:hover {
+  background: var(--splash-neutral-btn-bg-hover);
+}
+
 .splash-bg-glow {
   position: absolute;
   border-radius: 999px;
-  filter: blur(60px);
-  opacity: 0.5;
+  z-index: 0;
+  filter: blur(var(--splash-glow-blur));
+  opacity: var(--splash-glow-opacity);
   pointer-events: none;
 }
 
@@ -183,7 +254,7 @@
   height: 280px;
   top: 8%;
   left: 10%;
-  background: rgba(0, 183, 255, 0.22);
+  background: var(--splash-glow-1-color);
 }
 
 .splash-bg-glow-2 {
@@ -191,7 +262,7 @@
   height: 320px;
   right: 8%;
   top: 18%;
-  background: rgba(168, 85, 247, 0.18);
+  background: var(--splash-glow-2-color);
 }
 
 .splash-bg-glow-3 {
@@ -200,22 +271,18 @@
   bottom: 6%;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(34, 197, 94, 0.12);
+  background: var(--splash-glow-3-color);
 }
 
 .splash-bubble {
   position: absolute;
   z-index: 1;
   border-radius: 50%;
-  background: radial-gradient(
-    circle at 30% 30%,
-    rgba(255, 255, 255, 0.75),
-    rgba(167, 213, 255, 0.25) 35%,
-    rgba(167, 213, 255, 0.08) 70%,
-    rgba(167, 213, 255, 0.02) 100%
-  );
-  border: 1px solid rgba(180, 220, 255, 0.16);
-  box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.12);
+  background: var(--splash-bubble-gradient);
+  border: 1px solid var(--splash-bubble-border);
+  box-shadow:
+    inset 0 2px 6px var(--splash-bubble-inset),
+    0 8px 22px var(--splash-bubble-shadow);
   animation-name: splashFloat;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
@@ -224,14 +291,15 @@
 .splash-stars {
   position: absolute;
   inset: 0;
+  z-index: 0;
   pointer-events: none;
   background-image:
-    radial-gradient(circle at 20% 20%, rgba(255,255,255,0.8) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 80% 24%, rgba(255,255,255,0.65) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 60% 72%, rgba(255,255,255,0.45) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 36% 82%, rgba(255,255,255,0.55) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 72% 58%, rgba(255,255,255,0.55) 0 1px, transparent 1.5px);
-  opacity: 0.45;
+    radial-gradient(circle at 20% 20%, var(--splash-star-1) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 80% 24%, var(--splash-star-2) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 60% 72%, var(--splash-star-3) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 36% 82%, var(--splash-star-4) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 72% 58%, var(--splash-star-5) 0 1px, transparent 1.5px);
+  opacity: var(--splash-star-opacity);
 }
 
 .splash-badge {
@@ -242,9 +310,9 @@
   font-size: clamp(0.78rem, 2.5vw, 0.9rem);
   font-weight: 600;
   letter-spacing: 0.02em;
-  color: #d7e5ff;
-  background: rgba(114, 137, 255, 0.14);
-  border: 1px solid rgba(142, 164, 255, 0.2);
+  color: var(--splash-badge-text);
+  background: var(--splash-badge-bg);
+  border: 1px solid var(--splash-badge-border);
 }
 
 .splash-title {
@@ -253,21 +321,72 @@
   line-height: 0.95;
   font-weight: 900;
   letter-spacing: -0.04em;
-  text-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 8px 28px var(--splash-title-shadow);
 }
 
 .splash-title-liquid {
-  background: linear-gradient(180deg, #79e7ff 0%, #4db7ff 100%);
+  background: var(--splash-title-liquid-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .splash-title-sort {
-  background: linear-gradient(180deg, #c89bff 0%, #8a6cff 100%);
+  background: var(--splash-title-sort-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+@media (prefers-color-scheme: light) {
+  .splash-screen {
+    --splash-text-color: #132033;
+    --splash-bg-top-glow: rgba(114, 162, 255, 0.3);
+    --splash-bg-bottom-glow: rgba(88, 222, 255, 0.22);
+    --splash-bg-main: linear-gradient(180deg, #edf4ff 0%, #e4eefc 54%, #dbe7fa 100%);
+    --splash-rim-gradient: linear-gradient(180deg, #ffffff, #c2d8ff);
+    --splash-rim-outline: rgba(122, 166, 236, 0.5);
+    --splash-rim-shadow: rgba(84, 114, 168, 0.16);
+    --splash-glass-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(216, 232, 255, 0.32));
+    --splash-glass-border: rgba(109, 152, 228, 0.72);
+    --splash-glass-inset-shadow: rgba(255, 255, 255, 0.45);
+    --splash-glass-shadow: rgba(87, 123, 180, 0.18);
+    --splash-liquid-divider: rgba(255, 255, 255, 0.22);
+    --splash-liquid-highlight: rgba(255, 255, 255, 0.16);
+    --splash-shine-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.18));
+    --splash-neutral-btn-bg: rgba(255, 255, 255, 0.72);
+    --splash-neutral-btn-bg-hover: rgba(255, 255, 255, 0.86);
+    --splash-neutral-btn-text: #27405d;
+    --splash-neutral-btn-shadow: rgba(117, 146, 189, 0.18);
+    --splash-badge-text: #365074;
+    --splash-badge-bg: rgba(128, 158, 255, 0.12);
+    --splash-badge-border: rgba(120, 152, 230, 0.2);
+    --splash-title-liquid-gradient: linear-gradient(180deg, #48b8ea 0%, #2b84f2 100%);
+    --splash-title-sort-gradient: linear-gradient(180deg, #8a7dff 0%, #7056f1 100%);
+    --splash-title-shadow: rgba(138, 162, 201, 0.24);
+    --splash-bubble-gradient: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.96), rgba(174, 213, 255, 0.34) 38%, rgba(174, 213, 255, 0.12) 72%, rgba(174, 213, 255, 0.02) 100%);
+    --splash-bubble-border: rgba(131, 176, 235, 0.24);
+    --splash-bubble-inset: rgba(255, 255, 255, 0.35);
+    --splash-star-1: rgba(68, 107, 165, 0.48);
+    --splash-star-2: rgba(88, 113, 170, 0.42);
+    --splash-star-3: rgba(75, 103, 151, 0.34);
+    --splash-star-4: rgba(73, 112, 171, 0.4);
+    --splash-star-5: rgba(73, 112, 171, 0.4);
+    --splash-star-opacity: 0.9;
+    --splash-glow-1-color: rgba(67, 177, 255, 0.28);
+    --splash-glow-2-color: rgba(134, 116, 255, 0.22);
+    --splash-glow-3-color: rgba(59, 205, 170, 0.18);
+    --splash-atmosphere-overlay:
+      radial-gradient(circle at 16% 20%, rgba(87, 185, 255, 0.24), transparent 29%),
+      radial-gradient(circle at 84% 18%, rgba(146, 124, 255, 0.2), transparent 28%),
+      radial-gradient(circle at 50% 72%, rgba(77, 218, 190, 0.18), transparent 30%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.02) 34%, rgba(151, 185, 255, 0.08) 65%, rgba(255, 255, 255, 0.16));
+    --splash-vignette-overlay: radial-gradient(circle at center, rgba(255, 255, 255, 0) 44%, rgba(146, 170, 212, 0.22) 100%);
+    --splash-glow-opacity: 0.72;
+    --splash-glow-blur: 74px;
+    --splash-bubble-shadow: rgba(97, 151, 220, 0.16);
+    color-scheme: light;
+  }
 }
 
 @keyframes splashFloat {
