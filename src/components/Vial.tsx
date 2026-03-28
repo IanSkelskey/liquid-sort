@@ -287,7 +287,7 @@ export function Vial({
             <stop offset="0%" style={{ stopColor: 'var(--vial-shine-top)' }} />
             <stop offset="100%" style={{ stopColor: 'var(--vial-shine-bottom)' }} />
           </linearGradient>
-          <linearGradient id={liquidGlossId} x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id={liquidGlossId} x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" style={{ stopColor: 'var(--vial-liquid-highlight-strong)' }} />
             <stop offset="100%" style={{ stopColor: 'var(--vial-liquid-highlight-soft)' }} />
           </linearGradient>
@@ -339,18 +339,6 @@ export function Vial({
           filter={`url(#${glassShadowId})`}
         />
 
-        <path
-          d={buildBottomRoundedPath(
-            geometry.glassX + 1.6,
-            geometry.glassY + 2,
-            geometry.glassWidth - 3.2,
-            geometry.glassHeight * 0.24,
-            Math.max(geometry.glassRadius - 2, 8),
-          )}
-          fill="rgba(255,255,255,0.05)"
-          opacity={0.72}
-        />
-
         <g clipPath={`url(#${liquidClipId})`}>
           {liquidRuns.map((run) => {
             const runHeight = run.count * segmentHeight;
@@ -376,14 +364,15 @@ export function Vial({
 
                 {!run.hidden && (
                   <motion.rect
-                    x={geometry.liquidX}
-                    width={geometry.liquidWidth}
-                    height={Math.min(runHeight, variant === 'splash' ? 18 : 16)}
-                    y={runY}
+                    x={geometry.liquidX + geometry.liquidWidth * 0.08}
+                    width={geometry.liquidWidth * (variant === 'splash' ? 0.24 : 0.22)}
+                    height={Math.max(runHeight - 8, 0)}
+                    y={runY + 4}
+                    rx={999}
                     fill={`url(#${liquidGlossId})`}
-                    opacity={0.8}
+                    opacity={variant === 'splash' ? 0.34 : 0.3}
                     initial={shouldAnimateSegments ? { y: runY - 18, opacity: 0 } : false}
-                    animate={{ y: runY, opacity: 0.8 }}
+                    animate={{ y: runY + 4, opacity: variant === 'splash' ? 0.34 : 0.3 }}
                     transition={{
                       duration: 0.28,
                       delay: shouldAnimateSegments ? run.startIndex * 0.03 + 0.06 : 0,
