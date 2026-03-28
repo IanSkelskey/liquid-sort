@@ -36,6 +36,7 @@
     radial-gradient(circle at top, var(--scene-bg-top-glow), transparent 30%),
     radial-gradient(circle at bottom left, var(--scene-bg-bottom-glow), transparent 28%),
     var(--scene-bg-main);
+  transition: background 0.45s ease;
 }
 
 .scene-background__layer,
@@ -43,6 +44,15 @@
 .scene-background__stars,
 .scene-background__bubble {
   pointer-events: none;
+  transition:
+    background 0.45s ease,
+    opacity 0.45s ease,
+    top 0.45s ease,
+    left 0.45s ease,
+    width 0.45s ease,
+    height 0.45s ease,
+    border-color 0.45s ease,
+    box-shadow 0.45s ease;
 }
 
 .scene-background__layer {

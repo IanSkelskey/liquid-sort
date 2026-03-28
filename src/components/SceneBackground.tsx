@@ -53,7 +53,7 @@ export function SceneBackground({
 
       {bubbles.map((bubble, index) => (
         <div
-          key={`${variant}-bubble-${index}`}
+          key={`bubble-${index}`}
           className="scene-background__bubble"
           style={{
             width: bubble.size,

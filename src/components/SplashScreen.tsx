@@ -1,77 +1,74 @@
-import { CircleHelp, Heart, Play, Sparkles } from "lucide-react";
-import { COLOR_VALUES } from "../game/types";
-import { SceneBackground } from "./SceneBackground";
-import { Vial } from "./Vial";
+import { CircleHelp, Heart, Play, Sparkles } from 'lucide-react';
+import { COLOR_VALUES } from '../game/types';
+import { Vial } from './Vial';
 
 import './SplashScreen.css';
 
 type SplashScreenProps = {
-    onStart: () => void;
-    onHowToPlay?: () => void;
-}
+  onStart: () => void;
+  onHowToPlay?: () => void;
+};
 
 export default function SplashScreen({
-    onStart,
-    onHowToPlay,
+  onStart,
+  onHowToPlay,
 }: SplashScreenProps) {
-    return (
-        <SceneBackground variant="splash">
-            <div className="splash-screen">
-                <div className="splash-content">
-                    <div className="splash-badge">
-                        <Sparkles className="splash-badge-icon" aria-hidden="true" />
-                        <span>Alchemical Puzzle Game</span>
-                    </div>
-                    <h1 className="splash-title">
-                        <span className="splash-title-liquid">Liquid</span>
-                        <span className="splash-title-sort">Sort</span>
-                    </h1>
-                    <div className="splash-vial-row" aria-hidden="true">
-                        {Object.values(COLOR_VALUES).slice(0, 5).map((color, index) => (
-                            <Vial
-                                key={index}
-                                variant="splash"
-                                segments={[color, color, color]}
-                            />
-                        ))}
-                    </div>
+  return (
+    <div className="splash-screen">
+      <div className="splash-content">
+        <div className="splash-badge">
+          <Sparkles className="splash-badge-icon" aria-hidden="true" />
+          <span>Alchemical Puzzle Game</span>
+        </div>
+        <h1 className="splash-title">
+          <span className="splash-title-liquid">Liquid</span>
+          <span className="splash-title-sort">Sort</span>
+        </h1>
+        <div className="splash-vial-row" aria-hidden="true">
+          {Object.values(COLOR_VALUES).slice(0, 5).map((color, index) => (
+            <Vial
+              key={index}
+              variant="splash"
+              segments={[color, color, color]}
+            />
+          ))}
+        </div>
 
-                    <div className="splash-actions">
-                        <button className="splash-btn splash-btn-primary" onClick={onStart}>
-                            <span className="splash-btn-icon" aria-hidden="true">
-                                <Play fill="currentColor" />
-                            </span>
-                            <span className="splash-btn-label">Play</span>
-                        </button>
-                        {onHowToPlay && (
-                            <button className="splash-btn splash-btn-secondary" onClick={onHowToPlay}>
-                                <span className="splash-btn-icon" aria-hidden="true">
-                                    <CircleHelp />
-                                </span>
-                                <span className="splash-btn-label">How to Play</span>
-                            </button>
-                        )}
-                    </div>
+        <div className="splash-actions">
+          <button className="splash-btn splash-btn-primary" onClick={onStart}>
+            <span className="splash-btn-icon" aria-hidden="true">
+              <Play fill="currentColor" />
+            </span>
+            <span className="splash-btn-label">Play</span>
+          </button>
+          {onHowToPlay && (
+            <button className="splash-btn splash-btn-secondary" onClick={onHowToPlay}>
+              <span className="splash-btn-icon" aria-hidden="true">
+                <CircleHelp />
+              </span>
+              <span className="splash-btn-label">How to Play</span>
+            </button>
+          )}
+        </div>
 
-                    <div className="splash-footer">
-                        <span className="splash-footer-text">
-                            <span className="splash-footer-label">Made with</span>
-                            <span className="splash-footer-heart" aria-hidden="true">
-                                <Heart fill="currentColor" />
-                            </span>
-                            <span className="splash-footer-label">by </span>
-                            <a
-                                className="splash-footer-link"
-                                href="https://github.com/IanSkelskey"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                Ian Skelskey
-                            </a>
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </SceneBackground>
-    );
+        <div className="splash-footer">
+          <span className="splash-footer-text">
+            <span className="splash-footer-label">Made with</span>
+            <span className="splash-footer-heart" aria-hidden="true">
+              <Heart fill="currentColor" />
+            </span>
+            <span className="splash-footer-label">by </span>
+            <a
+              className="splash-footer-link"
+              href="https://github.com/IanSkelskey"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Ian Skelskey
+            </a>
+          </span>
+        </div>
+      </div>
+    </div>
+  );
 }

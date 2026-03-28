@@ -1,14 +1,14 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
-import { setMusicVolume, getMusicVolume, setMusicMuted } from '../audio/music';
-import { setSfxVolume, getSfxVolume, setSfxMuted } from '../audio/sfx';
+import { setMusicVolume, getMusicVolume, setMusicMuted, isMusicMuted } from '../audio/music';
+import { setSfxVolume, getSfxVolume, setSfxMuted, isSfxMuted } from '../audio/sfx';
 import './AudioControls.css';
 
 export function AudioControls() {
   const [open, setOpen] = useState(false);
   const [musicVol, setMusicVol] = useState(() => getMusicVolume());
   const [sfxVol, setSfxVol] = useState(() => getSfxVolume());
-  const [muted, setMuted] = useState(false);
+  const [muted, setMuted] = useState(() => isMusicMuted() || isSfxMuted());
   const panelRef = useRef<HTMLDivElement>(null);
 
   const handleMusicChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
