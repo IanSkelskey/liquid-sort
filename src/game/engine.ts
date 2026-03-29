@@ -1,4 +1,16 @@
-import { type Color, type GameState, type Vial, VIAL_CAPACITY } from './types';
+import { type Color, type GameState, VIAL_CAPACITY } from './types';
+import {
+  areHiddenEqual,
+  areVialsEqual,
+  canPour,
+  countHiddenSegments,
+  getTopColor,
+  getTopRevealedCount,
+  isBoardWon,
+  isCompletedVisibleVial,
+  isVialComplete,
+  revealTopSegments,
+} from './rules';
 
 export type MoveSkipReason =
   | 'source-empty'
@@ -27,260 +39,195 @@ export interface MoveAnalysis {
   skipCounts: Record<MoveSkipReason, number>;
 }
 
-/** Reveals the top segment of each vial (hidden segments become visible when on top). */
-export function revealTopSegments(state: GameState): GameState {
-  let changed = false;
-  const newHidden = state.hidden.map((vialHidden, vi) => {
-    const vial = state.vials[vi];
-    if (vial.length === 0) return vialHidden;
-    const topIdx = vial.length - 1;
-    if (topIdx < vialHidden.length && vialHidden[topIdx]) {
-      changed = true;
-      const copy = [...vialHidden];
-      copy[topIdx] = false;
-      return copy;
-    }
-    return vialHidden;
-  });
-  return changed ? { ...state, hidden: newHidden } : state;
-}
-
-/** Returns the top color of a vial, or undefined if empty. */
-export function getTopColor(vial: Vial): Color | undefined {
-  return vial.length > 0 ? vial[vial.length - 1] : undefined;
-}
-
-/** Returns how many consecutive same-colored segments are on top. */
-export function getTopCount(vial: Vial): number {
-  if (vial.length === 0) return 0;
-  const topColor = vial[vial.length - 1];
-  let count = 0;
-  for (let i = vial.length - 1; i >= 0; i--) {
-    if (vial[i] === topColor) count++;
-    else break;
-  }
-  return count;
-}
-
-/** Returns how many same-colored revealed segments can be poured from the top. */
-function getTopRevealedCount(vial: Vial, hidden: boolean[]): number {
-  if (vial.length === 0) return 0;
-  const topColor = vial[vial.length - 1];
-  let count = 0;
-  for (let i = vial.length - 1; i >= 0; i--) {
-    if (hidden[i]) break;
-    if (vial[i] === topColor) count++;
-    else break;
-  }
-  return count;
-}
-
-function areVialsEqual(a: Vial[], b: Vial[]): boolean {
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i++) {
-    if (a[i].length !== b[i].length) return false;
-    for (let j = 0; j < a[i].length; j++) {
-      if (a[i][j] !== b[i][j]) return false;
-    }
-  }
-  return true;
-}
-
-function areHiddenEqual(a: boolean[][], b: boolean[][]): boolean {
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i++) {
-    if (a[i].length !== b[i].length) return false;
-    for (let j = 0; j < a[i].length; j++) {
-      if (a[i][j] !== b[i][j]) return false;
-    }
-  }
-  return true;
-}
-
-function countHiddenSegments(hidden: boolean[][]): number {
-  let count = 0;
-  for (const vialHidden of hidden) {
-    for (const segmentHidden of vialHidden) {
-      if (segmentHidden) count++;
-    }
-  }
-  return count;
-}
-
 function isReversibleSuperficialMove(state: GameState, from: number, to: number): boolean {
-  const forward = pour(state, from, to);
-  if (!forward) return false;
+  const forwardState = pour(state, from, to);
 
-  // If hidden segment count dropped, the move revealed information and is meaningful.
-  if (countHiddenSegments(forward.hidden) < countHiddenSegments(state.hidden)) return false;
+  if (!forwardState) {
+    return false;
+  }
 
-  const backward = pour(forward, to, from);
-  if (!backward) return false;
+  if (countHiddenSegments(forwardState.hidden) < countHiddenSegments(state.hidden)) {
+    return false;
+  }
 
-  return areVialsEqual(state.vials, backward.vials) && areHiddenEqual(state.hidden, backward.hidden);
+  const backwardState = pour(forwardState, to, from);
+
+  if (!backwardState) {
+    return false;
+  }
+
+  return (
+    areVialsEqual(state.vials, backwardState.vials) &&
+    areHiddenEqual(state.hidden, backwardState.hidden)
+  );
 }
 
-/** Checks whether pouring from source into dest is a valid move. */
-export function canPour(source: Vial, dest: Vial): boolean {
-  if (source.length === 0) return false;
-  if (dest.length >= VIAL_CAPACITY) return false;
-  if (dest.length === 0) return true;
-  return getTopColor(source) === getTopColor(dest);
-}
-
-/**
- * Performs a pour from vials[fromIndex] into vials[toIndex].
- * Returns a new GameState (immutable). Returns null if the pour is invalid.
- */
 export function pour(state: GameState, fromIndex: number, toIndex: number): GameState | null {
   const source = state.vials[fromIndex];
   const dest = state.vials[toIndex];
 
-  if (fromIndex === toIndex) return null;
-  if (!canPour(source, dest)) return null;
-
-  // Don't allow pouring from a completed single-color vial (only if fully revealed)
-  const fromHidden = state.hidden[fromIndex] ?? [];
-  if (isVialComplete(source) && !fromHidden.some((h) => h)) return null;
-
-  const topColor = getTopColor(source)!;
-  const available = VIAL_CAPACITY - dest.length;
-  // Don't count hidden segments as part of the top group
-  const sourceHidden = state.hidden[fromIndex] ?? [];
-  let topCount = 0;
-  for (let i = source.length - 1; i >= 0; i--) {
-    if (source[i] === topColor && !sourceHidden[i]) topCount++;
-    else break;
+  if (fromIndex === toIndex || !canPour(source, dest)) {
+    return null;
   }
-  const count = Math.min(topCount, available);
 
-  const newSource: Vial = source.slice(0, source.length - count);
-  const newDest: Vial = [...dest, ...Array<Color>(count).fill(topColor as Color)];
+  const sourceHidden = state.hidden[fromIndex] ?? [];
 
-  const newVials: Vial[] = state.vials.map((v, i) => {
-    if (i === fromIndex) return newSource;
-    if (i === toIndex) return newDest;
-    return v;
-  });
+  if (isCompletedVisibleVial(source, sourceHidden)) {
+    return null;
+  }
 
-  const newState: GameState = {
+  const topColor = getTopColor(source);
+  const topCount = getTopRevealedCount(source, sourceHidden);
+
+  if (!topColor || topCount === 0) {
+    return null;
+  }
+
+  const count = Math.min(topCount, VIAL_CAPACITY - dest.length);
+  const nextSource = source.slice(0, source.length - count);
+  const nextDest = [...dest, ...Array<Color>(count).fill(topColor)];
+
+  const nextState: GameState = {
     ...state,
-    vials: newVials,
+    vials: state.vials.map((vial, vialIndex) => {
+      if (vialIndex === fromIndex) {
+        return nextSource;
+      }
+
+      if (vialIndex === toIndex) {
+        return nextDest;
+      }
+
+      return vial;
+    }),
+    hidden: state.hidden.map((vialHidden, vialIndex) => {
+      if (vialIndex === fromIndex) {
+        return vialHidden.slice(0, nextSource.length);
+      }
+
+      if (vialIndex === toIndex) {
+        return [...vialHidden, ...Array<boolean>(count).fill(false)];
+      }
+
+      return vialHidden;
+    }),
     selectedVial: null,
     moveHistory: [...state.moveHistory, { from: fromIndex, to: toIndex, count }],
     moveCount: state.moveCount + 1,
-    hidden: state.hidden.map((vh, vi) => {
-      if (vi === fromIndex) return vh.slice(0, newSource.length);
-      if (vi === toIndex) return [...vh, ...Array<boolean>(count).fill(false)];
-      return vh;
-    }),
   };
 
-  const revealed = revealTopSegments(newState);
-  return { ...revealed, won: checkWin(revealed) };
+  const revealedState = revealTopSegments(nextState);
+
+  return {
+    ...revealedState,
+    won: checkWin(revealedState),
+  };
 }
 
-/** A vial is complete if it has exactly VIAL_CAPACITY segments of the same color. */
-function isVialComplete(vial: Vial): boolean {
-  return vial.length === VIAL_CAPACITY && vial.every((c) => c === vial[0]);
-}
-
-/** Checks if the game is won: every vial is either empty or complete with no hidden segments. */
 export function checkWin(state: GameState): boolean {
-  return state.vials.every(
-    (vial, i) =>
-      vial.length === 0 ||
-      (isVialComplete(vial) && !(state.hidden[i]?.some((h) => h)))
-  );
+  return isBoardWon(state);
 }
 
-/** Undoes the last move. Returns new state or null if no moves to undo. */
 export function undo(state: GameState): GameState | null {
-  if (state.moveHistory.length === 0) return null;
+  if (state.moveHistory.length === 0) {
+    return null;
+  }
 
   const lastMove = state.moveHistory[state.moveHistory.length - 1];
-  const { from, to, count } = lastMove;
-
-  const source = state.vials[to]; // the pour target becomes the undo source
-  const dest = state.vials[from]; // the pour source becomes the undo target
-
-  const movedSegments = source.slice(source.length - count);
-  const newSource = source.slice(0, source.length - count);
-  const newDest = [...dest, ...movedSegments];
-
-  const newVials = state.vials.map((v, i) => {
-    if (i === to) return newSource;
-    if (i === from) return newDest;
-    return v;
-  });
+  const source = state.vials[lastMove.to];
+  const dest = state.vials[lastMove.from];
+  const movedSegments = source.slice(source.length - lastMove.count);
+  const nextSource = source.slice(0, source.length - lastMove.count);
+  const nextDest = [...dest, ...movedSegments];
 
   return revealTopSegments({
     ...state,
-    vials: newVials,
+    vials: state.vials.map((vial, vialIndex) => {
+      if (vialIndex === lastMove.to) {
+        return nextSource;
+      }
+
+      if (vialIndex === lastMove.from) {
+        return nextDest;
+      }
+
+      return vial;
+    }),
+    hidden: state.hidden.map((vialHidden, vialIndex) => {
+      if (vialIndex === lastMove.to) {
+        return vialHidden.slice(0, nextSource.length);
+      }
+
+      if (vialIndex === lastMove.from) {
+        return [...vialHidden, ...Array<boolean>(lastMove.count).fill(false)];
+      }
+
+      return vialHidden;
+    }),
     selectedVial: null,
     moveHistory: state.moveHistory.slice(0, -1),
     moveCount: state.moveCount - 1,
     won: false,
-    hidden: state.hidden.map((vh, vi) => {
-      if (vi === to) return vh.slice(0, newSource.length);
-      if (vi === from) return [...vh, ...Array<boolean>(count).fill(false)];
-      return vh;
-    }),
   });
 }
 
-/** Shuffles the contents of a single vial. Returns new state. */
 export function shuffleVial(state: GameState, vialIndex: number): GameState {
   const vial = state.vials[vialIndex];
-  if (vial.length <= 1) return state;
 
-  const vialHidden = state.hidden[vialIndex] ?? [];
+  if (vial.length <= 1) {
+    return state;
+  }
 
-  // Collect indices and colors of only revealed segments
+  const hidden = state.hidden[vialIndex] ?? [];
   const revealedIndices: number[] = [];
   const revealedColors: Color[] = [];
-  for (let i = 0; i < vial.length; i++) {
-    if (!vialHidden[i]) {
-      revealedIndices.push(i);
-      revealedColors.push(vial[i]);
+
+  for (let index = 0; index < vial.length; index += 1) {
+    if (!hidden[index]) {
+      revealedIndices.push(index);
+      revealedColors.push(vial[index]);
     }
   }
 
-  if (revealedColors.length <= 1) return state;
+  if (revealedColors.length <= 1) {
+    return state;
+  }
 
-  // Fisher-Yates shuffle on revealed colors only, retry if unchanged
-  let shuffledColors: Color[];
+  let shuffledColors: Color[] = [];
   let attempts = 0;
+
   do {
     shuffledColors = [...revealedColors];
-    for (let i = shuffledColors.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffledColors[i], shuffledColors[j]] = [shuffledColors[j], shuffledColors[i]];
+
+    for (let index = shuffledColors.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(Math.random() * (index + 1));
+      [shuffledColors[index], shuffledColors[swapIndex]] = [
+        shuffledColors[swapIndex],
+        shuffledColors[index],
+      ];
     }
-    attempts++;
+
+    attempts += 1;
   } while (
     attempts < 100 &&
-    shuffledColors.every((c, i) => c === revealedColors[i])
+    shuffledColors.every((color, colorIndex) => color === revealedColors[colorIndex])
   );
 
-  // Reconstruct vial with hidden segments in place
-  const shuffled: Vial = [...vial];
-  for (let i = 0; i < revealedIndices.length; i++) {
-    shuffled[revealedIndices[i]] = shuffledColors[i];
+  const shuffledVial = [...vial];
+
+  for (let index = 0; index < revealedIndices.length; index += 1) {
+    shuffledVial[revealedIndices[index]] = shuffledColors[index];
   }
-
-  const newVials: Vial[] = state.vials.map((v, i) =>
-    i === vialIndex ? shuffled : v
-  );
 
   return revealTopSegments({
     ...state,
-    vials: newVials,
+    vials: state.vials.map((currentVial, currentIndex) =>
+      currentIndex === vialIndex ? shuffledVial : currentVial
+    ),
     selectedVial: null,
   });
 }
 
-/** Adds an empty vial to the game. Returns new state. */
 export function addEmptyVial(state: GameState): GameState {
   return {
     ...state,
@@ -291,12 +238,52 @@ export function addEmptyVial(state: GameState): GameState {
   };
 }
 
-/** Returns true if any valid pour exists on the board. */
 export function hasMovesLeft(state: GameState): boolean {
-  return analyzeMoveAvailability(state).hasMovesLeft;
+  for (let sourceIndex = 0; sourceIndex < state.vials.length; sourceIndex += 1) {
+    const source = state.vials[sourceIndex];
+    const sourceHidden = state.hidden[sourceIndex] ?? [];
+    const sourceHasHidden = sourceHidden.some(Boolean);
+
+    if (source.length === 0 || isCompletedVisibleVial(source, sourceHidden)) {
+      continue;
+    }
+
+    const topColor = getTopColor(source);
+    const topCount = getTopRevealedCount(source, sourceHidden);
+
+    if (!topColor || topCount === 0) {
+      continue;
+    }
+
+    const wouldEmptySource = topCount === source.length;
+    const sourceIsUniform = source.every((color) => color === topColor);
+
+    for (let destIndex = 0; destIndex < state.vials.length; destIndex += 1) {
+      if (sourceIndex === destIndex) {
+        continue;
+      }
+
+      const dest = state.vials[destIndex];
+
+      if (!canPour(source, dest)) {
+        continue;
+      }
+
+      if (sourceIsUniform && !wouldEmptySource && !sourceHasHidden) {
+        if (dest.length === 0 || dest.length + topCount < VIAL_CAPACITY) {
+          continue;
+        }
+      }
+
+      if (!isReversibleSuperficialMove(state, sourceIndex, destIndex)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
-/** Builds a debug report describing valid/invalid moves and skip reasons. */
 export function analyzeMoveAvailability(state: GameState): MoveAnalysis {
   const skipCounts: Record<MoveSkipReason, number> = {
     'source-empty': 0,
@@ -312,30 +299,30 @@ export function analyzeMoveAvailability(state: GameState): MoveAnalysis {
   const validMoves: MoveDebugEntry[] = [];
   const skippedMoves: MoveDebugEntry[] = [];
 
-  for (let i = 0; i < state.vials.length; i++) {
-    const source = state.vials[i];
-    const sourceHidden = state.hidden[i] ?? [];
+  for (let sourceIndex = 0; sourceIndex < state.vials.length; sourceIndex += 1) {
+    const source = state.vials[sourceIndex];
+    const sourceHidden = state.hidden[sourceIndex] ?? [];
     const sourceHiddenCount = sourceHidden.filter(Boolean).length;
     const sourceHasHidden = sourceHiddenCount > 0;
 
     if (source.length === 0) {
-      skipCounts['source-empty']++;
+      skipCounts['source-empty'] += 1;
       skippedMoves.push({
-        from: i,
-        to: i,
+        from: sourceIndex,
+        to: sourceIndex,
         reason: 'source-empty',
-        sourceLength: source.length,
-        destLength: source.length,
+        sourceLength: 0,
+        destLength: 0,
         sourceHiddenCount,
       });
       continue;
     }
 
-    if (isVialComplete(source) && !sourceHasHidden) {
-      skipCounts['source-complete-revealed']++;
+    if (isCompletedVisibleVial(source, sourceHidden)) {
+      skipCounts['source-complete-revealed'] += 1;
       skippedMoves.push({
-        from: i,
-        to: i,
+        from: sourceIndex,
+        to: sourceIndex,
         reason: 'source-complete-revealed',
         sourceLength: source.length,
         destLength: source.length,
@@ -344,13 +331,14 @@ export function analyzeMoveAvailability(state: GameState): MoveAnalysis {
       continue;
     }
 
-    for (let j = 0; j < state.vials.length; j++) {
-      const dest = state.vials[j];
-      if (i === j) {
-        skipCounts['same-vial']++;
+    for (let destIndex = 0; destIndex < state.vials.length; destIndex += 1) {
+      const dest = state.vials[destIndex];
+
+      if (sourceIndex === destIndex) {
+        skipCounts['same-vial'] += 1;
         skippedMoves.push({
-          from: i,
-          to: j,
+          from: sourceIndex,
+          to: destIndex,
           reason: 'same-vial',
           sourceLength: source.length,
           destLength: dest.length,
@@ -360,10 +348,10 @@ export function analyzeMoveAvailability(state: GameState): MoveAnalysis {
       }
 
       if (!canPour(source, dest)) {
-        skipCounts['cannot-pour']++;
+        skipCounts['cannot-pour'] += 1;
         skippedMoves.push({
-          from: i,
-          to: j,
+          from: sourceIndex,
+          to: destIndex,
           reason: 'cannot-pour',
           sourceLength: source.length,
           destLength: dest.length,
@@ -372,13 +360,14 @@ export function analyzeMoveAvailability(state: GameState): MoveAnalysis {
         continue;
       }
 
-      const topColor = getTopColor(source)!;
+      const topColor = getTopColor(source);
       const topCount = getTopRevealedCount(source, sourceHidden);
-      if (topCount === 0) {
-        skipCounts['no-revealed-top']++;
+
+      if (!topColor || topCount === 0) {
+        skipCounts['no-revealed-top'] += 1;
         skippedMoves.push({
-          from: i,
-          to: j,
+          from: sourceIndex,
+          to: destIndex,
           reason: 'no-revealed-top',
           sourceLength: source.length,
           destLength: dest.length,
@@ -389,40 +378,41 @@ export function analyzeMoveAvailability(state: GameState): MoveAnalysis {
 
       const wouldEmptySource = topCount === source.length;
 
-      // Skip only if source is all one color, the move wouldn't empty
-      // the source vial, and wouldn't complete the destination
-      if (source.every((c) => c === topColor) && !wouldEmptySource && !sourceHasHidden) {
-        if (dest.length === 0) {
-          skipCounts['superficial-empty-transfer']++;
-          skippedMoves.push({
-            from: i,
-            to: j,
-            reason: 'superficial-empty-transfer',
-            sourceLength: source.length,
-            destLength: dest.length,
-            sourceHiddenCount,
-          });
-          continue; // moving to empty without freeing source
-        }
-        if (dest.length + topCount < VIAL_CAPACITY) {
-          skipCounts['superficial-non-completing']++;
-          skippedMoves.push({
-            from: i,
-            to: j,
-            reason: 'superficial-non-completing',
-            sourceLength: source.length,
-            destLength: dest.length,
-            sourceHiddenCount,
-          });
-          continue; // won't complete dest
+      if (isVialComplete(source) || source.every((color) => color === topColor)) {
+        if (!wouldEmptySource && !sourceHasHidden) {
+          if (dest.length === 0) {
+            skipCounts['superficial-empty-transfer'] += 1;
+            skippedMoves.push({
+              from: sourceIndex,
+              to: destIndex,
+              reason: 'superficial-empty-transfer',
+              sourceLength: source.length,
+              destLength: dest.length,
+              sourceHiddenCount,
+            });
+            continue;
+          }
+
+          if (dest.length + topCount < VIAL_CAPACITY) {
+            skipCounts['superficial-non-completing'] += 1;
+            skippedMoves.push({
+              from: sourceIndex,
+              to: destIndex,
+              reason: 'superficial-non-completing',
+              sourceLength: source.length,
+              destLength: dest.length,
+              sourceHiddenCount,
+            });
+            continue;
+          }
         }
       }
 
-      if (isReversibleSuperficialMove(state, i, j)) {
-        skipCounts['superficial-loop']++;
+      if (isReversibleSuperficialMove(state, sourceIndex, destIndex)) {
+        skipCounts['superficial-loop'] += 1;
         skippedMoves.push({
-          from: i,
-          to: j,
+          from: sourceIndex,
+          to: destIndex,
           reason: 'superficial-loop',
           sourceLength: source.length,
           destLength: dest.length,
@@ -432,8 +422,8 @@ export function analyzeMoveAvailability(state: GameState): MoveAnalysis {
       }
 
       validMoves.push({
-        from: i,
-        to: j,
+        from: sourceIndex,
+        to: destIndex,
         reason: 'valid',
         moveCount: Math.min(topCount, VIAL_CAPACITY - dest.length),
         sourceLength: source.length,
@@ -451,11 +441,10 @@ export function analyzeMoveAvailability(state: GameState): MoveAnalysis {
   };
 }
 
-/** Calculates coin reward for completing a level. */
 export function calculateReward(level: number, moveCount: number): number {
-  // Base reward scales with level, bonus for efficiency
   const base = Math.min(3 + Math.floor(level / 5), 8);
   const efficiency = Math.max(0, 30 - moveCount);
   const bonus = Math.floor(efficiency / 10);
+
   return base + bonus;
 }

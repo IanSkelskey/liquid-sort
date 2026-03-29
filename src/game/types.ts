@@ -37,6 +37,7 @@ export const COLOR_VALUES: Record<Color, string> = {
 };
 
 export const VIAL_CAPACITY = 4;
+export const STARTER_COINS = 5;
 
 /** A vial is an array of colors, index 0 = bottom, last = top. Max length = VIAL_CAPACITY. */
 export type Vial = Color[];

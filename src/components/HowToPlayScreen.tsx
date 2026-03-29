@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import {
   ArrowLeft,
-  Check,
-  Droplets,
-  FlaskConical,
   MoveRight,
   Play,
-  Shuffle,
   Sparkles,
-  Undo2,
 } from 'lucide-react';
 import { COLOR_VALUES } from '../game/types';
 import { Vial } from './Vial';
+import {
+  HOW_TO_PLAY_RULES,
+  HOW_TO_PLAY_SECTIONS,
+  HOW_TO_PLAY_TOOLS,
+  type HowToPlaySection,
+} from './howToPlay/content';
 
 import './HowToPlayScreen.css';
 
@@ -20,78 +21,11 @@ type HowToPlayScreenProps = {
   onStart: () => void;
 };
 
-type HowToPlaySection = 'basics' | 'rules' | 'tools';
-
-const SECTIONS: Array<{
-  key: HowToPlaySection;
-  label: string;
-  title: string;
-  description: string;
-  icon: typeof Droplets;
-}> = [
-  {
-    key: 'basics',
-    label: 'Basics',
-    title: 'Make a valid pour',
-    description: 'Choose a source vial, then choose a destination that can accept the top color.',
-    icon: Droplets,
-  },
-  {
-    key: 'rules',
-    label: 'Rules',
-    title: 'Remember the core rules',
-    description: 'Every move follows a few simple constraints.',
-    icon: Check,
-  },
-  {
-    key: 'tools',
-    label: 'Tools',
-    title: 'Use helpers when needed',
-    description: 'The toolbar can help you recover or create space.',
-    icon: FlaskConical,
-  },
-];
-
-const RULES = [
-  {
-    icon: Droplets,
-    title: 'Only the top liquid moves',
-    description: 'You can only pour the color that is currently on top of the source vial.',
-  },
-  {
-    icon: MoveRight,
-    title: 'Targets must be compatible',
-    description: 'Pour into an empty vial or onto the same top color if there is still room.',
-  },
-  {
-    icon: Check,
-    title: 'Finish by grouping colors',
-    description: 'You win when each non-empty vial contains only one color.',
-  },
-];
-
-const TOOLS = [
-  {
-    icon: Undo2,
-    title: 'Undo',
-    description: 'Reverse your last move if you make a mistake.',
-  },
-  {
-    icon: Shuffle,
-    title: 'Shuffle',
-    description: 'Reorder the selected vial when you want a fresh angle.',
-  },
-  {
-    icon: FlaskConical,
-    title: 'Add Vial',
-    description: 'Spend coins to buy one extra empty vial for more breathing room.',
-  },
-];
-
 export function HowToPlayScreen({ onBack, onStart }: HowToPlayScreenProps) {
   const [activeSection, setActiveSection] = useState<HowToPlaySection>('basics');
-  const activeSectionMeta = SECTIONS.find((section) => section.key === activeSection) ?? SECTIONS[0];
-  const activeIndex = SECTIONS.findIndex((section) => section.key === activeSection);
+  const activeSectionMeta =
+    HOW_TO_PLAY_SECTIONS.find((section) => section.key === activeSection) ?? HOW_TO_PLAY_SECTIONS[0];
+  const activeIndex = HOW_TO_PLAY_SECTIONS.findIndex((section) => section.key === activeSection);
   const ActiveSectionIcon = activeSectionMeta.icon;
 
   return (
@@ -109,7 +43,7 @@ export function HowToPlayScreen({ onBack, onStart }: HowToPlayScreenProps) {
         </div>
 
         <div className="how-to-play-tabs" role="tablist" aria-label="How to play sections">
-          {SECTIONS.map(({ key, label, icon: Icon }) => (
+          {HOW_TO_PLAY_SECTIONS.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
               type="button"
@@ -130,7 +64,9 @@ export function HowToPlayScreen({ onBack, onStart }: HowToPlayScreenProps) {
         <div className="how-to-play-stage">
           <section className="how-to-play-panel">
             <div className="how-to-play-panel-header">
-              <span className="how-to-play-panel-step">Step {activeIndex + 1} of {SECTIONS.length}</span>
+              <span className="how-to-play-panel-step">
+                Step {activeIndex + 1} of {HOW_TO_PLAY_SECTIONS.length}
+              </span>
               <div className="how-to-play-panel-head">
                 <span className="how-to-play-panel-icon" aria-hidden="true">
                   <ActiveSectionIcon />
@@ -175,7 +111,7 @@ export function HowToPlayScreen({ onBack, onStart }: HowToPlayScreenProps) {
             {activeSection === 'rules' && (
               <div className="how-to-play-panel-body">
                 <div className="how-to-play-item-list">
-                  {RULES.map(({ icon: Icon, title, description }) => (
+                  {HOW_TO_PLAY_RULES.map(({ icon: Icon, title, description }) => (
                     <div key={title} className="how-to-play-item">
                       <span className="how-to-play-item-icon" aria-hidden="true">
                         <Icon />
@@ -193,7 +129,7 @@ export function HowToPlayScreen({ onBack, onStart }: HowToPlayScreenProps) {
             {activeSection === 'tools' && (
               <div className="how-to-play-panel-body">
                 <div className="how-to-play-item-list">
-                  {TOOLS.map(({ icon: Icon, title, description }) => (
+                  {HOW_TO_PLAY_TOOLS.map(({ icon: Icon, title, description }) => (
                     <div key={title} className="how-to-play-item">
                       <span className="how-to-play-item-icon" aria-hidden="true">
                         <Icon />

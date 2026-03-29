@@ -5,11 +5,11 @@ import { Toolbar } from './Toolbar';
 import { GameBoard } from './GameBoard';
 import { WinModal } from './WinModal';
 import { ConfirmModal } from './ConfirmModal';
-import { UNDO_COST, SHUFFLE_COST, ADD_VIAL_COST } from '../game/types';
-import { calculateReward } from '../game/engine';
 import { MoveDebugPanel } from '../debug/MoveDebugPanel';
 import { useMoveDebug } from '../debug/useMoveDebug';
 import { playSoundEffect } from '../audio/sfx';
+import { canAddExtraVial, canShuffleSelectedVial, canUndoMove, getLevelReward } from '../game/selectors';
+import { UNDO_COST } from '../game/types';
 
 type GameScreenProps = {
   onReturnToSplash: () => void;
@@ -21,8 +21,12 @@ export function GameScreen({ onReturnToSplash }: GameScreenProps) {
   const [showReturnConfirm, setShowReturnConfirm] = useState(false);
 
   const { moveAnalysis, movesRemaining, totalCandidates, validMovePreview, skipSummary } = useMoveDebug(state);
+  const canUndo = canUndoMove(state);
+  const canShuffle = canShuffleSelectedVial(state);
+  const canAddVial = canAddExtraVial(state);
+  const coinsEarned = getLevelReward(state);
+  const canUndoFromStuckModal = canUndo;
 
-  const coinsEarned = state.won ? calculateReward(state.level, state.moveCount) : 0;
   const stuck = !state.won && state.moveHistory.length > 0 && !moveAnalysis.hasMovesLeft;
 
   const prevStuckRef = useRef(stuck);
@@ -44,18 +48,9 @@ export function GameScreen({ onReturnToSplash }: GameScreenProps) {
       />
       <Toolbar
         coins={state.coins}
-        canUndo={
-          state.moveHistory.length > 0 &&
-          !state.won &&
-          state.coins >= UNDO_COST
-        }
-        canShuffle={
-          state.selectedVial !== null &&
-          state.coins >= SHUFFLE_COST &&
-          state.vials[state.selectedVial].length > 1 &&
-          !state.won
-        }
-        canAddVial={state.coins >= ADD_VIAL_COST && !state.addedVial && !state.won}
+        canUndo={canUndo}
+        canShuffle={canShuffle}
+        canAddVial={canAddVial}
         selectedVial={state.selectedVial}
         onUndo={undoMove}
         onShuffle={() => {
@@ -85,11 +80,16 @@ export function GameScreen({ onReturnToSplash }: GameScreenProps) {
       <ConfirmModal
         visible={stuck}
         title="No Moves Left!"
-        message="There are no valid moves remaining. You can restart the level or undo moves to try a different approach."
+        message={
+          canUndoFromStuckModal
+            ? 'There are no valid moves remaining. You can restart the level or undo moves to try a different approach.'
+            : 'There are no valid moves remaining. Restart the level to try a different approach.'
+        }
         confirmLabel="Restart Level"
         onConfirm={restart}
         onCancel={undoMove}
-        cancelLabel={state.coins >= UNDO_COST ? `Undo (${UNDO_COST} coins)` : undefined}
+        cancelLabel={canUndoFromStuckModal ? `Undo (${UNDO_COST} coins)` : null}
+        closeOnOverlayClick={false}
         icon="!"
       />
       <ConfirmModal

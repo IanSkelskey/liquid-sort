@@ -1,18 +1,11 @@
 import { Vial } from './Vial';
-import { COLOR_VALUES, type GameState, VIAL_CAPACITY } from '../game/types';
+import { COLOR_VALUES, type GameState } from '../game/types';
+import { isBoardVialComplete } from '../game/selectors';
 import './GameBoard.css';
 
 interface GameBoardProps {
   state: GameState;
   onSelectVial: (index: number) => void;
-}
-
-function isVialComplete(vial: string[], hidden: boolean[]): boolean {
-  return (
-    vial.length === VIAL_CAPACITY &&
-    vial.every((c) => c === vial[0]) &&
-    !hidden.some((h) => h)
-  );
 }
 
 export function GameBoard({ state, onSelectVial }: GameBoardProps) {
@@ -24,7 +17,7 @@ export function GameBoard({ state, onSelectVial }: GameBoardProps) {
           segments={vial.map((color) => COLOR_VALUES[color])}
           hiddenMask={state.hidden[i] ?? []}
           isSelected={state.selectedVial === i}
-          isComplete={isVialComplete(vial, state.hidden[i] ?? [])}
+          isComplete={isBoardVialComplete(state, i)}
           onClick={() => onSelectVial(i)}
         />
       ))}

@@ -6,10 +6,11 @@ interface ConfirmModalProps {
   title: string;
   message: string;
   confirmLabel?: string;
-  cancelLabel?: string;
+  cancelLabel?: string | null;
   icon?: string;
   onConfirm: () => void;
   onCancel: () => void;
+  closeOnOverlayClick?: boolean;
 }
 
 export function ConfirmModal({
@@ -18,9 +19,10 @@ export function ConfirmModal({
   message,
   confirmLabel = 'Reset',
   cancelLabel = 'Cancel',
-  icon = '⚠️',
+  icon = '!',
   onConfirm,
   onCancel,
+  closeOnOverlayClick = true,
 }: ConfirmModalProps) {
   return (
     <AnimatePresence>
@@ -30,7 +32,7 @@ export function ConfirmModal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={onCancel}
+          onClick={closeOnOverlayClick ? onCancel : undefined}
         >
           <motion.div
             className="confirm-modal"
@@ -38,16 +40,26 @@ export function ConfirmModal({
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.85, opacity: 0 }}
             transition={{ type: 'spring', duration: 0.35 }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
           >
             <div className="confirm-icon">{icon}</div>
             <h2 className="confirm-title">{title}</h2>
             <p className="confirm-message">{message}</p>
             <div className="confirm-actions">
-              <button className="confirm-btn confirm-btn--cancel" onClick={onCancel}>
-                {cancelLabel}
-              </button>
-              <button className="confirm-btn confirm-btn--danger" onClick={onConfirm}>
+              {cancelLabel !== null && (
+                <button
+                  type="button"
+                  className="confirm-btn confirm-btn--cancel"
+                  onClick={onCancel}
+                >
+                  {cancelLabel}
+                </button>
+              )}
+              <button
+                type="button"
+                className="confirm-btn confirm-btn--danger"
+                onClick={onConfirm}
+              >
                 {confirmLabel}
               </button>
             </div>
