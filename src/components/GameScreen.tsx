@@ -11,9 +11,14 @@ import { MoveDebugPanel } from '../debug/MoveDebugPanel';
 import { useMoveDebug } from '../debug/useMoveDebug';
 import { playSoundEffect } from '../audio/sfx';
 
-export function GameScreen() {
+type GameScreenProps = {
+  onReturnToSplash: () => void;
+};
+
+export function GameScreen({ onReturnToSplash }: GameScreenProps) {
   const { state, selectVial, undoMove, restart, nextLevel, shuffleSelected, addVial, resetGame } = useGame();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showReturnConfirm, setShowReturnConfirm] = useState(false);
 
   const { moveAnalysis, movesRemaining, totalCandidates, validMovePreview, skipSummary } = useMoveDebug(state);
 
@@ -33,6 +38,7 @@ export function GameScreen() {
       <Header
         level={state.level}
         moveCount={state.moveCount}
+        onTitleClick={() => setShowReturnConfirm(true)}
         onRestart={restart}
         onResetGame={() => setShowResetConfirm(true)}
       />
@@ -85,6 +91,18 @@ export function GameScreen() {
         onCancel={undoMove}
         cancelLabel={state.coins >= UNDO_COST ? `Undo (${UNDO_COST} coins)` : undefined}
         icon="!"
+      />
+      <ConfirmModal
+        visible={showReturnConfirm}
+        title="Return to splash screen?"
+        message="Your current vial layout will reset, but your saved level and coins will stay."
+        confirmLabel="Return to Splash"
+        onConfirm={() => {
+          setShowReturnConfirm(false);
+          onReturnToSplash();
+        }}
+        onCancel={() => setShowReturnConfirm(false)}
+        icon="?"
       />
 
       <MoveDebugPanel

@@ -1,0 +1,95 @@
+.liquid-sort-wordmark {
+  --liquid-sort-wordmark-liquid-gradient: linear-gradient(180deg, #79e7ff 0%, #4db7ff 100%);
+  --liquid-sort-wordmark-sort-gradient: linear-gradient(180deg, #c89bff 0%, #8a6cff 100%);
+  --liquid-sort-wordmark-liquid-color: #5fcfff;
+  --liquid-sort-wordmark-sort-color: #a883ff;
+  --liquid-sort-wordmark-shadow: rgba(0, 0, 0, 0.4);
+  display: inline-block;
+  white-space: nowrap;
+  font-family: inherit;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  text-shadow: 0 8px 28px var(--liquid-sort-wordmark-shadow);
+}
+
+.liquid-sort-wordmark--hero {
+  font-size: clamp(2.4rem, 9vw, 5.8rem);
+}
+
+.liquid-sort-wordmark--header {
+  font-size: clamp(1.45rem, 3.7vw, 1.9rem);
+  text-shadow: 0 6px 18px var(--liquid-sort-wordmark-shadow);
+}
+
+.liquid-sort-wordmark__liquid,
+.liquid-sort-wordmark__sort {
+  display: inline-block;
+}
+
+.liquid-sort-wordmark__liquid {
+  color: var(--liquid-sort-wordmark-liquid-color);
+}
+
+.liquid-sort-wordmark__sort {
+  color: var(--liquid-sort-wordmark-sort-color);
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .liquid-sort-wordmark__liquid,
+  .liquid-sort-wordmark__sort {
+    background-repeat: no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .liquid-sort-wordmark__liquid {
+    background-image: var(--liquid-sort-wordmark-liquid-gradient);
+  }
+
+  .liquid-sort-wordmark__sort {
+    background-image: var(--liquid-sort-wordmark-sort-gradient);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .liquid-sort-wordmark {
+    --liquid-sort-wordmark-liquid-gradient: linear-gradient(180deg, #48b8ea 0%, #2b84f2 100%);
+    --liquid-sort-wordmark-sort-gradient: linear-gradient(180deg, #8a7dff 0%, #7056f1 100%);
+    --liquid-sort-wordmark-liquid-color: #3499ea;
+    --liquid-sort-wordmark-sort-color: #7a67f5;
+    --liquid-sort-wordmark-shadow: rgba(138, 162, 201, 0.24);
+  }
+}
+
+@media (max-width: 700px) {
+  .liquid-sort-wordmark--hero {
+    font-size: clamp(2.7rem, 11vw, 4rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .liquid-sort-wordmark--header {
+    font-size: 1.35rem;
+  }
+}
+
+@media (max-width: 460px) {
+  .liquid-sort-wordmark--hero {
+    font-size: clamp(2.55rem, 13.8vw, 3.7rem);
+  }
+}
+
+@media (max-height: 820px) {
+  .liquid-sort-wordmark--hero {
+    font-size: clamp(2.3rem, 8.5vw, 5rem);
+  }
+}
+
+@media (max-height: 620px) {
+  .liquid-sort-wordmark--hero {
+    font-size: clamp(1.7rem, 7vw, 2.8rem);
+  }
+}

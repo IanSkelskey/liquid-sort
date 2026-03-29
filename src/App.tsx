@@ -54,7 +54,7 @@ function App() {
           onStart={() => setActiveScreen('game')}
         />
       ) : (
-        <GameScreen />
+        <GameScreen onReturnToSplash={() => setActiveScreen('splash')} />
       )}
       <AudioControls />
     </SceneBackground>

@@ -29,9 +29,6 @@
   --splash-badge-text: #d7e5ff;
   --splash-badge-bg: rgba(114, 137, 255, 0.14);
   --splash-badge-border: rgba(142, 164, 255, 0.2);
-  --splash-title-liquid-gradient: linear-gradient(180deg, #79e7ff 0%, #4db7ff 100%);
-  --splash-title-sort-gradient: linear-gradient(180deg, #c89bff 0%, #8a6cff 100%);
-  --splash-title-shadow: rgba(0, 0, 0, 0.4);
   --splash-footer-text: rgba(215, 229, 255, 0.52);
   --splash-footer-link: rgba(196, 211, 255, 0.76);
   --splash-footer-link-hover: rgba(222, 232, 255, 0.9);
@@ -260,25 +257,6 @@
 
 .splash-title {
   margin: 0;
-  font-size: clamp(2.4rem, 9vw, 5.8rem);
-  line-height: 0.95;
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  text-shadow: 0 8px 28px var(--splash-title-shadow);
-}
-
-.splash-title-liquid {
-  background: var(--splash-title-liquid-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.splash-title-sort {
-  background: var(--splash-title-sort-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .splash-footer {
@@ -364,9 +342,6 @@
     --splash-badge-text: #365074;
     --splash-badge-bg: rgba(128, 158, 255, 0.12);
     --splash-badge-border: rgba(120, 152, 230, 0.2);
-    --splash-title-liquid-gradient: linear-gradient(180deg, #48b8ea 0%, #2b84f2 100%);
-    --splash-title-sort-gradient: linear-gradient(180deg, #8a7dff 0%, #7056f1 100%);
-    --splash-title-shadow: rgba(138, 162, 201, 0.24);
     --splash-footer-text: rgba(54, 80, 116, 0.58);
     --splash-footer-link: rgba(73, 104, 150, 0.8);
     --splash-footer-link-hover: rgba(39, 64, 93, 0.92);
@@ -383,11 +358,6 @@
   .splash-content {
     width: min(100%, 440px);
   }
-
-  .splash-title {
-    font-size: clamp(2.7rem, 11vw, 4rem);
-  }
-
   .splash-actions {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -417,20 +387,12 @@
     --splash-vial-gap: clamp(8px, 2.4vw, 10px);
     --splash-action-gap: 10px;
   }
-
-  .splash-title {
-    font-size: clamp(2.55rem, 13.8vw, 3.7rem);
-  }
 }
 
 @media (max-height: 820px) {
   .splash-screen {
     --splash-vial-width: clamp(56px, 9.8vw, 72px);
     --splash-vial-height: clamp(140px, 20vh, 174px);
-  }
-
-  .splash-title {
-    font-size: clamp(2.3rem, 8.5vw, 5rem);
   }
 }
 
@@ -446,11 +408,6 @@
   .splash-badge {
     display: none;
   }
-
-  .splash-title {
-    font-size: clamp(1.7rem, 7vw, 2.8rem);
-  }
-
   .splash-actions {
     margin-top: 12px;
     width: min(100%, 360px);

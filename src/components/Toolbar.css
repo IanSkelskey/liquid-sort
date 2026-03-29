@@ -3,7 +3,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 24px 4px;
-  max-width: 600px;
+  max-width: var(--game-shell-max-width);
   margin: 0 auto;
   width: 100%;
   gap: 12px;
@@ -126,5 +126,30 @@
 
   .power-label {
     display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .toolbar {
+    padding: 10px 24px 6px;
+    gap: 16px;
+  }
+
+  .toolbar-coins {
+    padding: 8px 16px;
+  }
+
+  .coin-count {
+    font-size: 1rem;
+  }
+
+  .toolbar-powers {
+    gap: 10px;
+  }
+
+  .power-btn {
+    min-height: 44px;
+    padding: 8px 14px;
+    font-size: 0.86rem;
   }
 }

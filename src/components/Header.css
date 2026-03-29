@@ -3,7 +3,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px 12px;
-  max-width: 600px;
+  max-width: var(--game-shell-max-width);
   margin: 0 auto;
   flex-wrap: wrap;
   gap: 12px;
@@ -17,14 +17,34 @@
 }
 
 .header-title {
-  font-size: 1.6rem;
-  font-weight: 800;
-  letter-spacing: -0.5px;
   margin: 0;
-  background: var(--gradient-title);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  line-height: 1;
+}
+
+.header-title-button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.header-title-button:hover {
+  transform: translateY(-1px);
+  filter: saturate(1.04);
+}
+
+.header-title-button:active {
+  transform: translateY(0);
+}
+
+.header-title-button:focus-visible {
+  outline: 3px solid rgba(131, 181, 255, 0.28);
+  outline-offset: 6px;
+  border-radius: 12px;
 }
 
 .header-stats {
@@ -107,12 +127,24 @@
     padding: 16px 16px 8px;
   }
 
-  .header-title {
-    font-size: 1.35rem;
-  }
-
   .header-btn {
     padding: 7px 12px;
     font-size: 0.8rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .header {
+    padding: 24px 24px 14px;
+  }
+
+  .header-stats {
+    font-size: 0.92rem;
+  }
+
+  .header-btn {
+    min-height: 46px;
+    padding: 9px 18px;
+    font-size: 0.9rem;
   }
 }

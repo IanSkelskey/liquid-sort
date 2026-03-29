@@ -1,5 +1,6 @@
 import { CircleHelp, Heart, Play, Sparkles } from 'lucide-react';
 import { COLOR_VALUES } from '../game/types';
+import { LiquidSortWordmark } from './LiquidSortWordmark';
 import { Vial } from './Vial';
 
 import './SplashScreen.css';
@@ -21,8 +22,7 @@ export default function SplashScreen({
           <span>Alchemical Puzzle Game</span>
         </div>
         <h1 className="splash-title">
-          <span className="splash-title-liquid">Liquid</span>
-          <span className="splash-title-sort">Sort</span>
+          <LiquidSortWordmark variant="hero" />
         </h1>
         <div className="splash-vial-row" aria-hidden="true">
           {Object.values(COLOR_VALUES).slice(0, 5).map((color, index) => (

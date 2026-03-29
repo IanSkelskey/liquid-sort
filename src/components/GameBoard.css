@@ -4,11 +4,16 @@
   justify-content: center;
   align-items: flex-end;
   align-content: flex-start;
-  gap: 14px;
-  padding: 24px 16px 40px;
-  max-width: 600px;
+  gap: var(--game-board-gap);
+  padding: 24px var(--game-board-padding-inline) 40px;
+  max-width: var(--game-board-max-width);
   margin: 0 auto;
   flex: 1;
+}
+
+.game-board .vial--game {
+  --vial-width: var(--game-vial-width);
+  --vial-height: var(--game-vial-height);
 }
 
 @media (max-width: 480px) {

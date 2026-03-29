@@ -15,6 +15,12 @@
   --overlay: rgba(15, 23, 42, 0.45);
   --gradient-btn: linear-gradient(135deg, #3b82f6, #6366f1);
   --gradient-title: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  --game-shell-max-width: 600px;
+  --game-board-max-width: 600px;
+  --game-board-gap: 14px;
+  --game-board-padding-inline: 16px;
+  --game-vial-width: 52px;
+  --game-vial-height: 160px;
   color-scheme: light dark;
 }
 
@@ -58,7 +64,7 @@ body {
 }
 
 .app {
-  max-width: 600px;
+  max-width: var(--game-shell-max-width);
   width: 100%;
   margin: 0 auto;
   min-height: 100dvh;
@@ -66,4 +72,26 @@ body {
   flex-direction: column;
   position: relative;
   z-index: 1;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --game-shell-max-width: 860px;
+    --game-board-max-width: 920px;
+    --game-board-gap: 18px;
+    --game-board-padding-inline: 20px;
+    --game-vial-width: 60px;
+    --game-vial-height: 184px;
+  }
+}
+
+@media (min-width: 1440px) and (min-height: 820px) {
+  :root {
+    --game-shell-max-width: 940px;
+    --game-board-max-width: 1020px;
+    --game-board-gap: 20px;
+    --game-board-padding-inline: 24px;
+    --game-vial-width: 64px;
+    --game-vial-height: 194px;
+  }
 }
