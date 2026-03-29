@@ -1,4 +1,4 @@
-const musicSrc = new URL('../../assets/music/gameplay.opus', import.meta.url).href;
+const musicSrc = new URL('../assets/music/gameplay.opus', import.meta.url).href;
 
 let audio: HTMLAudioElement | null = null;
 
