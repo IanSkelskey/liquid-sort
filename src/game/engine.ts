@@ -1,3 +1,4 @@
+import { canUseVialAsSource, canUseVialAsTarget, getVialModifier } from './modifiers';
 import { type Color, type GameState, VIAL_CAPACITY } from './types';
 import {
   areHiddenEqual,
@@ -14,8 +15,10 @@ import {
 
 export type MoveSkipReason =
   | 'source-empty'
+  | 'source-blocked-by-modifier'
   | 'source-complete-revealed'
   | 'same-vial'
+  | 'target-blocked-by-modifier'
   | 'cannot-pour'
   | 'no-revealed-top'
   | 'superficial-empty-transfer'
@@ -65,8 +68,10 @@ function isReversibleSuperficialMove(state: GameState, from: number, to: number)
 export function pour(state: GameState, fromIndex: number, toIndex: number): GameState | null {
   const source = state.vials[fromIndex];
   const dest = state.vials[toIndex];
+  const sourceModifier = getVialModifier(state.vialModifiers, fromIndex);
+  const destModifier = getVialModifier(state.vialModifiers, toIndex);
 
-  if (fromIndex === toIndex || !canPour(source, dest)) {
+  if (fromIndex === toIndex || !canPour(source, dest, sourceModifier, destModifier)) {
     return null;
   }
 
@@ -111,6 +116,7 @@ export function pour(state: GameState, fromIndex: number, toIndex: number): Game
 
       return vialHidden;
     }),
+    vialModifiers: state.vialModifiers,
     selectedVial: null,
     moveHistory: [...state.moveHistory, { from: fromIndex, to: toIndex, count }],
     moveCount: state.moveCount + 1,
@@ -233,6 +239,7 @@ export function addEmptyVial(state: GameState): GameState {
     ...state,
     vials: [...state.vials, []],
     hidden: [...state.hidden, []],
+    vialModifiers: [...state.vialModifiers, 'none'],
     addedVial: true,
     selectedVial: null,
   };
@@ -243,8 +250,13 @@ export function hasMovesLeft(state: GameState): boolean {
     const source = state.vials[sourceIndex];
     const sourceHidden = state.hidden[sourceIndex] ?? [];
     const sourceHasHidden = sourceHidden.some(Boolean);
+    const sourceModifier = getVialModifier(state.vialModifiers, sourceIndex);
 
-    if (source.length === 0 || isCompletedVisibleVial(source, sourceHidden)) {
+    if (
+      source.length === 0 ||
+      !canUseVialAsSource(sourceModifier) ||
+      isCompletedVisibleVial(source, sourceHidden)
+    ) {
       continue;
     }
 
@@ -264,8 +276,9 @@ export function hasMovesLeft(state: GameState): boolean {
       }
 
       const dest = state.vials[destIndex];
+      const destModifier = getVialModifier(state.vialModifiers, destIndex);
 
-      if (!canPour(source, dest)) {
+      if (!canPour(source, dest, sourceModifier, destModifier)) {
         continue;
       }
 
@@ -287,8 +300,10 @@ export function hasMovesLeft(state: GameState): boolean {
 export function analyzeMoveAvailability(state: GameState): MoveAnalysis {
   const skipCounts: Record<MoveSkipReason, number> = {
     'source-empty': 0,
+    'source-blocked-by-modifier': 0,
     'source-complete-revealed': 0,
     'same-vial': 0,
+    'target-blocked-by-modifier': 0,
     'cannot-pour': 0,
     'no-revealed-top': 0,
     'superficial-empty-transfer': 0,
@@ -304,6 +319,7 @@ export function analyzeMoveAvailability(state: GameState): MoveAnalysis {
     const sourceHidden = state.hidden[sourceIndex] ?? [];
     const sourceHiddenCount = sourceHidden.filter(Boolean).length;
     const sourceHasHidden = sourceHiddenCount > 0;
+    const sourceModifier = getVialModifier(state.vialModifiers, sourceIndex);
 
     if (source.length === 0) {
       skipCounts['source-empty'] += 1;
@@ -313,6 +329,19 @@ export function analyzeMoveAvailability(state: GameState): MoveAnalysis {
         reason: 'source-empty',
         sourceLength: 0,
         destLength: 0,
+        sourceHiddenCount,
+      });
+      continue;
+    }
+
+    if (!canUseVialAsSource(sourceModifier)) {
+      skipCounts['source-blocked-by-modifier'] += 1;
+      skippedMoves.push({
+        from: sourceIndex,
+        to: sourceIndex,
+        reason: 'source-blocked-by-modifier',
+        sourceLength: source.length,
+        destLength: source.length,
         sourceHiddenCount,
       });
       continue;
@@ -333,6 +362,7 @@ export function analyzeMoveAvailability(state: GameState): MoveAnalysis {
 
     for (let destIndex = 0; destIndex < state.vials.length; destIndex += 1) {
       const dest = state.vials[destIndex];
+      const destModifier = getVialModifier(state.vialModifiers, destIndex);
 
       if (sourceIndex === destIndex) {
         skipCounts['same-vial'] += 1;
@@ -347,7 +377,20 @@ export function analyzeMoveAvailability(state: GameState): MoveAnalysis {
         continue;
       }
 
-      if (!canPour(source, dest)) {
+      if (!canUseVialAsTarget(destModifier)) {
+        skipCounts['target-blocked-by-modifier'] += 1;
+        skippedMoves.push({
+          from: sourceIndex,
+          to: destIndex,
+          reason: 'target-blocked-by-modifier',
+          sourceLength: source.length,
+          destLength: dest.length,
+          sourceHiddenCount,
+        });
+        continue;
+      }
+
+      if (!canPour(source, dest, sourceModifier, destModifier)) {
         skipCounts['cannot-pour'] += 1;
         skippedMoves.push({
           from: sourceIndex,

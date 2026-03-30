@@ -60,6 +60,11 @@ export const HOW_TO_PLAY_RULES: HowToPlayItem[] = [
     description: 'Pour into an empty vial or onto the same top color if there is still room.',
   },
   {
+    icon: FlaskConical,
+    title: 'Directional vials change routing',
+    description: 'IN vials only accept liquid. OUT vials can pour out, but they cannot receive.',
+  },
+  {
     icon: Check,
     title: 'Finish by grouping colors',
     description: 'You win when each non-empty vial contains only one color.',

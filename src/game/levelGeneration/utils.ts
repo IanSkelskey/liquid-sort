@@ -1,4 +1,4 @@
-import type { Color, GameState, Vial } from '../types';
+import type { Color, GameState, Vial, VialModifier } from '../types';
 import { VIAL_CAPACITY } from '../types';
 
 export function createRng(seed: number) {
@@ -18,6 +18,10 @@ export function cloneVials(vials: Vial[]): Vial[] {
 
 export function cloneHidden(hidden: boolean[][]): boolean[][] {
   return hidden.map((vialHidden) => [...vialHidden]);
+}
+
+export function cloneVialModifiers(vialModifiers: VialModifier[]): VialModifier[] {
+  return [...vialModifiers];
 }
 
 export function countNonEmptyVials(vials: Vial[]): number {
@@ -139,11 +143,12 @@ export function hasTargetSilhouette(vials: Vial[], numColors: number, numEmpty: 
   return fullCount === numColors && emptyCount === numEmpty;
 }
 
-export function getStateKey(state: Pick<GameState, 'vials' | 'hidden'>): string {
+export function getStateKey(state: Pick<GameState, 'vials' | 'hidden' | 'vialModifiers'>): string {
   return state.vials
     .map((vial, index) => {
       const hidden = state.hidden[index] ?? [];
-      return `${vial.join(',')}:${hidden.map((isHidden) => (isHidden ? '1' : '0')).join('')}`;
+      const modifier = state.vialModifiers[index] ?? 'none';
+      return `${vial.join(',')}:${hidden.map((isHidden) => (isHidden ? '1' : '0')).join('')}:${modifier}`;
     })
     .join('|');
 }

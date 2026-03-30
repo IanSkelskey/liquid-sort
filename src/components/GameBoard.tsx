@@ -16,6 +16,7 @@ export function GameBoard({ state, onSelectVial }: GameBoardProps) {
           key={i}
           segments={vial.map((color) => COLOR_VALUES[color])}
           hiddenMask={state.hidden[i] ?? []}
+          modifier={state.vialModifiers[i] ?? 'none'}
           isSelected={state.selectedVial === i}
           isComplete={isBoardVialComplete(state, i)}
           onClick={() => onSelectVial(i)}

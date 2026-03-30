@@ -19,8 +19,10 @@ export function useMoveDebug(state: GameState): MoveDebugData {
         skippedMoves: [],
         skipCounts: {
           'source-empty': 0,
+          'source-blocked-by-modifier': 0,
           'source-complete-revealed': 0,
           'same-vial': 0,
+          'target-blocked-by-modifier': 0,
           'cannot-pour': 0,
           'no-revealed-top': 0,
           'superficial-empty-transfer': 0,

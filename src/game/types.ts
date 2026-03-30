@@ -41,6 +41,7 @@ export const STARTER_COINS = 5;
 
 /** A vial is an array of colors, index 0 = bottom, last = top. Max length = VIAL_CAPACITY. */
 export type Vial = Color[];
+export type VialModifier = 'none' | 'in-only' | 'out-only';
 
 export interface Move {
   from: number;
@@ -55,6 +56,7 @@ export const ADD_VIAL_COST = 5;
 export interface GameState {
   vials: Vial[];
   hidden: boolean[][];
+  vialModifiers: VialModifier[];
   selectedVial: number | null;
   moveHistory: Move[];
   level: number;

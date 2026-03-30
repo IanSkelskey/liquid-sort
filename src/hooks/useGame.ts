@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useReducer, useRef } from 'react';
+import { canUseVialAsSource, getVialModifier } from '../game/modifiers';
 import type { GameState } from '../game/types';
 import { createGameState } from '../game/levels';
 import { reduceGameState } from '../game/reducer';
@@ -18,8 +19,10 @@ function canAttemptPour(state: GameState, fromIndex: number, toIndex: number): b
   const source = state.vials[fromIndex];
   const dest = state.vials[toIndex];
   const sourceHidden = state.hidden[fromIndex] ?? [];
+  const sourceModifier = getVialModifier(state.vialModifiers, fromIndex);
+  const destModifier = getVialModifier(state.vialModifiers, toIndex);
 
-  if (fromIndex === toIndex || !canPour(source, dest)) {
+  if (fromIndex === toIndex || !canPour(source, dest, sourceModifier, destModifier)) {
     return false;
   }
 
@@ -30,20 +33,27 @@ function canAttemptPour(state: GameState, fromIndex: number, toIndex: number): b
   return getTopRevealedCount(source, sourceHidden) > 0;
 }
 
+function canSelectVialAsSource(state: GameState, index: number): boolean {
+  return (
+    state.vials[index].length > 0 &&
+    canUseVialAsSource(getVialModifier(state.vialModifiers, index))
+  );
+}
+
 function shouldPlayPickupOnClick(state: GameState, index: number): boolean {
   if (state.won) {
     return false;
   }
 
   if (state.selectedVial === null) {
-    return state.vials[index].length > 0;
+    return canSelectVialAsSource(state, index);
   }
 
   if (state.selectedVial === index) {
     return false;
   }
 
-  return state.vials[index].length > 0 && !canAttemptPour(state, state.selectedVial, index);
+  return canSelectVialAsSource(state, index) && !canAttemptPour(state, state.selectedVial, index);
 }
 
 export function useGame() {

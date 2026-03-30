@@ -1,3 +1,4 @@
+import { cloneVialModifiers } from './modifiers';
 import { getSavedCoins } from './storage';
 import { generateLevelDefinition } from './levelGeneration/generator';
 import { cloneHidden, cloneVials } from './levelGeneration/utils';
@@ -14,6 +15,7 @@ export function createGameState(level: number, coins?: number): GameState {
   return revealTopSegments({
     vials: cloneVials(definition.vials),
     hidden: cloneHidden(definition.hidden),
+    vialModifiers: cloneVialModifiers(definition.vialModifiers),
     selectedVial: null,
     moveHistory: [],
     level,

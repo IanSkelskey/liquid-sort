@@ -1,3 +1,4 @@
+import { canUseVialAsSource, getVialModifier } from './modifiers';
 import { ADD_VIAL_COST, SHUFFLE_COST, type GameState, UNDO_COST } from './types';
 import { addEmptyVial, calculateReward, pour, shuffleVial, undo } from './engine';
 import { createGameState } from './levels';
@@ -11,6 +12,13 @@ export type GameAction =
   | { type: 'ADD_VIAL' }
   | { type: 'RESET_GAME' };
 
+function canSelectVialAsSource(state: GameState, index: number): boolean {
+  return (
+    state.vials[index].length > 0 &&
+    canUseVialAsSource(getVialModifier(state.vialModifiers, index))
+  );
+}
+
 export function reduceGameState(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case 'SELECT_VIAL': {
@@ -21,7 +29,7 @@ export function reduceGameState(state: GameState, action: GameAction): GameState
       const { index } = action;
 
       if (state.selectedVial === null) {
-        return state.vials[index].length === 0 ? state : { ...state, selectedVial: index };
+        return canSelectVialAsSource(state, index) ? { ...state, selectedVial: index } : state;
       }
 
       if (state.selectedVial === index) {
@@ -42,7 +50,7 @@ export function reduceGameState(state: GameState, action: GameAction): GameState
         };
       }
 
-      return state.vials[index].length > 0
+      return canSelectVialAsSource(state, index)
         ? { ...state, selectedVial: index }
         : { ...state, selectedVial: null };
     }

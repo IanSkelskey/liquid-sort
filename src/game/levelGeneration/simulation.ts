@@ -1,6 +1,6 @@
 import { analyzeMoveAvailability, pour, type MoveDebugEntry } from '../engine';
 import { getTopCount, revealTopSegments } from '../rules';
-import { type GameState, type Vial, VIAL_CAPACITY } from '../types';
+import { type GameState, type Vial, type VialModifier, VIAL_CAPACITY } from '../types';
 import { getDifficultyTargets } from './config';
 import type {
   MindlessRunPolicy,
@@ -11,6 +11,7 @@ import type {
 } from './types';
 import {
   cloneHidden,
+  cloneVialModifiers,
   cloneVials,
   countNonEmptyVials,
   createRng,
@@ -93,10 +94,16 @@ export function applyReverseMove(vials: Vial[], candidate: ReverseMoveCandidate)
   return nextVials;
 }
 
-export function createCandidateState(level: number, vials: Vial[], hidden: boolean[][]): GameState {
+export function createCandidateState(
+  level: number,
+  vials: Vial[],
+  hidden: boolean[][],
+  vialModifiers: VialModifier[]
+): GameState {
   return revealTopSegments({
     vials: cloneVials(vials),
     hidden: cloneHidden(hidden),
+    vialModifiers: cloneVialModifiers(vialModifiers),
     selectedVial: null,
     moveHistory: [],
     level,
@@ -312,10 +319,11 @@ function estimateTrapMoveRate(initialState: GameState, seedBase: number): number
 export function estimateMindlessRunStats(
   level: number,
   vials: Vial[],
-  hidden: boolean[][]
+  hidden: boolean[][],
+  vialModifiers: VialModifier[]
 ): MindlessRunStats {
   const targets = getDifficultyTargets(level, countNonEmptyVials(vials));
-  const initialState = createCandidateState(level, vials, hidden);
+  const initialState = createCandidateState(level, vials, hidden, vialModifiers);
   const random = collectPolicyRunStats(
     initialState,
     'random',

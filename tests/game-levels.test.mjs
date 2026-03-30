@@ -12,11 +12,28 @@ export function runGameLevelsTests() {
 
     assert.equal(isSolvedLayout(state.vials), false, `Level ${level} started solved`);
     assert.equal(
+      state.vialModifiers.length,
+      state.vials.length,
+      `Level ${level} did not create a modifier entry for every vial`
+    );
+    assert.equal(
       engine.analyzeMoveAvailability(state).hasMovesLeft,
       true,
       `Level ${level} started with no moves`
     );
   }
+
+  const modifierIntroState = levels.createGameState(15, 0);
+  assert.ok(
+    modifierIntroState.vialModifiers.includes('in-only'),
+    'Level 15 should introduce an IN-only vial'
+  );
+
+  const directionalState = levels.createGameState(30, 0);
+  assert.ok(
+    directionalState.vialModifiers.includes('out-only'),
+    'Level 30 should include an OUT-only vial'
+  );
 
   const original = levels.generateLevel(28);
   const repeated = levels.generateLevel(28);

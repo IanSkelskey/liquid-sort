@@ -1,7 +1,9 @@
+import { analyzeMoveAvailability } from '../engine';
 import { ALL_COLORS } from '../types';
-import type { Color, Vial } from '../types';
+import type { Color, Vial, VialModifier } from '../types';
 import { getDifficultyTargets, getLevelConfig } from './config';
 import { generateHidden } from './hidden';
+import { createVialModifiers } from './modifiers';
 import {
   applyReverseMove,
   buildReverseMoveCandidates,
@@ -10,10 +12,11 @@ import {
   hasReachableDeadEnd,
 } from './simulation';
 import { scoreLevelDefinition } from './scoring';
-import type { LevelCandidate, LevelDefinition } from './types';
+import type { LevelCandidate, LevelDefinition, ModifierCounts } from './types';
 import {
   buildSolvedVials,
   cloneHidden,
+  cloneVialModifiers,
   cloneVials,
   createRng,
   getVialLayoutKey,
@@ -25,10 +28,38 @@ import {
 
 const levelDefinitionCache = new Map<number, LevelDefinition>();
 
+function buildDefaultVialModifiers(vialCount: number): VialModifier[] {
+  return Array<VialModifier>(vialCount).fill('none');
+}
+
+function resolveVialModifiers(
+  level: number,
+  vials: Vial[],
+  hidden: boolean[][],
+  modifierCounts: ModifierCounts,
+  seedBase: number
+): VialModifier[] {
+  if (modifierCounts.inOnly === 0 && modifierCounts.outOnly === 0) {
+    return buildDefaultVialModifiers(vials.length);
+  }
+
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    const vialModifiers = createVialModifiers(vials, modifierCounts, createRng(seedBase + attempt * 887));
+    const openingState = createCandidateState(level, vials, hidden, vialModifiers);
+
+    if (analyzeMoveAvailability(openingState).hasMovesLeft) {
+      return vialModifiers;
+    }
+  }
+
+  return buildDefaultVialModifiers(vials.length);
+}
+
 function collectLevelCandidates(
   level: number,
   colors: Color[],
   numEmpty: number,
+  modifierCounts: ModifierCounts,
   reverseSteps: number,
   generationAttempts: number,
   seedOffset: number,
@@ -39,6 +70,7 @@ function collectLevelCandidates(
   for (let attempt = 0; attempt < generationAttempts; attempt += 1) {
     const rng = createRng(level * 7919 + 1013 + seedOffset + attempt * 379);
     const hiddenRng = createRng(level * 3571 + 997 + seedOffset + attempt * 733);
+    const modifierSeedBase = level * 4561 + 281 + seedOffset + attempt * 947;
     let vials = buildSolvedVials(colors, numEmpty);
     const targetReverseStepCount =
       reverseSteps + Math.floor(rng() * Math.max(12, Math.floor(reverseSteps * 0.25)));
@@ -74,16 +106,30 @@ function collectLevelCandidates(
       seenCandidateKeys.add(candidateKey);
 
       const hidden = generateHidden(level, normalizedVials, hiddenRng);
+      const vialModifiers = resolveVialModifiers(
+        level,
+        normalizedVials,
+        hidden,
+        modifierCounts,
+        modifierSeedBase + step * 131
+      );
+      const openingState = createCandidateState(level, normalizedVials, hidden, vialModifiers);
+
+      if (!analyzeMoveAvailability(openingState).hasMovesLeft) {
+        continue;
+      }
+
       const score = scoreLevelDefinition(
         level,
         colors.length,
-        { vials: normalizedVials, hidden },
+        { vials: normalizedVials, hidden, vialModifiers },
         appliedReverseSteps
       );
 
       candidates.push({
         vials: normalizedVials,
         hidden,
+        vialModifiers,
         score,
         deadEndReachable: false,
         appliedReverseSteps,
@@ -137,7 +183,7 @@ export function generateLevelDefinition(level: number): LevelDefinition {
     return cachedDefinition;
   }
 
-  const { numColors, numEmpty, reverseSteps, generationAttempts } = getLevelConfig(level);
+  const { numColors, numEmpty, reverseSteps, generationAttempts, modifierCounts } = getLevelConfig(level);
   const targets = getDifficultyTargets(level, numColors);
   const colors = ALL_COLORS.slice(0, numColors);
   const seenCandidateKeys = new Set<string>();
@@ -162,6 +208,7 @@ export function generateLevelDefinition(level: number): LevelDefinition {
         level,
         colors,
         numEmpty,
+        modifierCounts,
         searchPass.reverseSteps,
         searchPass.generationAttempts,
         searchPass.seedOffset,
@@ -173,9 +220,17 @@ export function generateLevelDefinition(level: number): LevelDefinition {
   if (candidates.length === 0) {
     const fallbackVials = buildDeterministicFallbackVials(colors, numEmpty);
     const fallbackHidden = generateHidden(level, fallbackVials, createRng(level * 9151 + 211));
+    const fallbackVialModifiers = resolveVialModifiers(
+      level,
+      fallbackVials,
+      fallbackHidden,
+      modifierCounts,
+      level * 9151 + 613
+    );
     const fallbackDefinition: LevelDefinition = {
       vials: fallbackVials,
       hidden: fallbackHidden,
+      vialModifiers: fallbackVialModifiers,
       score: Number.NEGATIVE_INFINITY,
       deadEndReachable: false,
     };
@@ -187,7 +242,12 @@ export function generateLevelDefinition(level: number): LevelDefinition {
   candidates.sort((left, right) => right.score - left.score);
 
   for (const candidate of candidates) {
-    candidate.mindlessStats = estimateMindlessRunStats(level, candidate.vials, candidate.hidden);
+    candidate.mindlessStats = estimateMindlessRunStats(
+      level,
+      candidate.vials,
+      candidate.hidden,
+      candidate.vialModifiers
+    );
     candidate.score += candidate.mindlessStats.risky.deadEndRate * targets.deadEndRateBonus;
     candidate.score += candidate.mindlessStats.risky.nonWinRate * (targets.deadEndRateBonus * 0.3);
     candidate.score -=
@@ -214,7 +274,12 @@ export function generateLevelDefinition(level: number): LevelDefinition {
   candidates.sort((left, right) => right.score - left.score);
 
   for (const candidate of candidates.slice(0, Math.min(12, candidates.length))) {
-    const initialState = createCandidateState(level, candidate.vials, candidate.hidden);
+    const initialState = createCandidateState(
+      level,
+      candidate.vials,
+      candidate.hidden,
+      candidate.vialModifiers
+    );
     candidate.deadEndReachable = hasReachableDeadEnd(level, initialState);
 
     if (candidate.deadEndReachable) {
@@ -252,6 +317,7 @@ export function generateLevelDefinition(level: number): LevelDefinition {
   const cachedSelectedDefinition: LevelDefinition = {
     vials: cloneVials(selectedDefinition.vials),
     hidden: cloneHidden(selectedDefinition.hidden),
+    vialModifiers: cloneVialModifiers(selectedDefinition.vialModifiers),
     score: selectedDefinition.score,
     deadEndReachable: selectedDefinition.deadEndReachable,
   };

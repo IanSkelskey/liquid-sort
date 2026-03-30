@@ -14,11 +14,17 @@ import {
 export function scoreLevelDefinition(
   level: number,
   numColors: number,
-  definition: Pick<LevelDefinition, 'vials' | 'hidden'>,
+  definition: Pick<LevelDefinition, 'vials' | 'hidden' | 'vialModifiers'>,
   appliedReverseSteps: number
 ): number {
   const targets = getDifficultyTargets(level, numColors);
-  const state = createCandidateState(level, definition.vials, definition.hidden);
+  const modifierCount = definition.vialModifiers.filter((modifier) => modifier !== 'none').length;
+  const state = createCandidateState(
+    level,
+    definition.vials,
+    definition.hidden,
+    definition.vialModifiers
+  );
   const moveAnalysis = analyzeMoveAvailability(state);
   const mixedVials = countMixedVials(definition.vials);
   const completeVials = countCompleteVials(definition.vials);
@@ -43,6 +49,7 @@ export function scoreLevelDefinition(
   score += distinctColorSpread * 3;
   score += interestingHiddenSegments * 10;
   score += topColorCollisions * 20;
+  score += modifierCount * 18;
   score -= boringHiddenSegments * 7;
   score -= Math.abs(moveAnalysis.validMoves.length - targets.moveTarget) * 6;
   score -= Math.max(0, targets.minMixedVials - mixedVials) * 25;

@@ -1,10 +1,16 @@
-import type { Vial } from '../types';
+import type { Vial, VialModifier } from '../types';
+
+export type ModifierCounts = {
+  inOnly: number;
+  outOnly: number;
+};
 
 export type LevelConfig = {
   numColors: number;
   numEmpty: number;
   reverseSteps: number;
   generationAttempts: number;
+  modifierCounts: ModifierCounts;
 };
 
 export type DifficultyTargets = {
@@ -34,6 +40,7 @@ export type ReverseMoveCandidate = {
 export type LevelDefinition = {
   vials: Vial[];
   hidden: boolean[][];
+  vialModifiers: VialModifier[];
   score: number;
   deadEndReachable: boolean;
 };

@@ -51,6 +51,56 @@
   overflow: visible;
 }
 
+.vial__modifier-badge {
+  --vial-modifier-color: rgba(103, 232, 249, 0.92);
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 42px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background:
+    linear-gradient(180deg, rgba(12, 18, 34, 0.96) 0%, rgba(17, 27, 49, 0.96) 100%);
+  border: 1px solid color-mix(in srgb, var(--vial-modifier-color) 72%, white 28%);
+  box-shadow:
+    0 10px 24px rgba(2, 8, 22, 0.34),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+  color: var(--vial-modifier-color);
+  z-index: 2;
+}
+
+.vial__modifier-badge--in-only {
+  --vial-modifier-color: rgba(103, 232, 249, 0.94);
+}
+
+.vial__modifier-badge--out-only {
+  --vial-modifier-color: rgba(251, 191, 36, 0.95);
+}
+
+.vial__modifier-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vial__modifier-icon svg {
+  width: 11px;
+  height: 11px;
+  stroke-width: 2.6;
+}
+
+.vial__modifier-label {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1;
+}
+
 .vial__complete-badge {
   --vial-complete-badge-size: 19px;
   position: absolute;
@@ -92,6 +142,14 @@
     --vial-shine-bottom: rgba(255, 255, 255, 0.28);
     --vial-hidden-fill: rgba(150, 160, 182, 0.9);
     --vial-hidden-icon: rgba(255, 255, 255, 0.92);
+  }
+
+  .vial__modifier-badge {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 247, 255, 0.98) 100%);
+    box-shadow:
+      0 10px 20px rgba(117, 153, 214, 0.2),
+      0 0 0 1px rgba(124, 166, 231, 0.14);
   }
 
   .vial__complete-badge {

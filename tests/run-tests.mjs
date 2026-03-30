@@ -1,6 +1,11 @@
+import { runGameEngineTests } from './game-engine.test.mjs';
 import { runGameLevelsTests } from './game-levels.test.mjs';
 
 const testSuites = [
+  {
+    name: 'game engine modifiers',
+    run: runGameEngineTests,
+  },
   {
     name: 'game level invariants',
     run: runGameLevelsTests,

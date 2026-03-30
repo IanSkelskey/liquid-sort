@@ -1,7 +1,8 @@
 import { useId, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Check } from 'lucide-react';
-import { VIAL_CAPACITY } from '../game/types';
+import { ArrowDown, ArrowUp, Check } from 'lucide-react';
+import { getVialModifierLabel, getVialModifierShortLabel, hasVialModifier } from '../game/modifiers';
+import { VIAL_CAPACITY, type VialModifier } from '../game/types';
 import { VialDefinitions } from './vial/VialDefinitions';
 import { VialLiquidLayers } from './vial/VialLiquidLayers';
 import { buildLiquidRuns } from './vial/liquidRuns';
@@ -17,6 +18,7 @@ import './Vial.css';
 interface VialProps {
   segments: string[];
   hiddenMask?: boolean[];
+  modifier?: VialModifier;
   isSelected?: boolean;
   onClick?: () => void;
   isComplete?: boolean;
@@ -28,6 +30,7 @@ interface VialProps {
 export function Vial({
   segments,
   hiddenMask = [],
+  modifier = 'none',
   isSelected = false,
   onClick,
   isComplete = false,
@@ -38,6 +41,7 @@ export function Vial({
   const isGameVariant = variant === 'game';
   const shouldAnimateSegments = isGameVariant;
   const shouldShowBadge = isGameVariant && isComplete && segments.length > 0;
+  const shouldShowModifierBadge = hasVialModifier(modifier);
   const revealedIndices = useRevealedSegments(hiddenMask, segments.length, isGameVariant);
   const geometry = VIAL_GEOMETRY[variant];
   const id = useId().replace(/:/g, '-');
@@ -49,6 +53,8 @@ export function Vial({
 
   const interactive = typeof onClick === 'function';
   const completeColor = segments[0] ?? 'var(--vial-outline-selected)';
+  const modifierLabel = getVialModifierLabel(modifier);
+  const modifierShortLabel = getVialModifierShortLabel(modifier);
   const outlineColor = isComplete && segments.length > 0
     ? completeColor
     : isSelected
@@ -100,6 +106,7 @@ export function Vial({
     interactive ? 'vial--interactive' : '',
     isSelected ? 'vial--selected' : '',
     isComplete ? 'vial--complete' : '',
+    shouldShowModifierBadge ? `vial--modifier-${modifier}` : '',
     className ?? '',
   ]
     .filter(Boolean)
@@ -112,6 +119,7 @@ export function Vial({
       onKeyDown={handleKeyDown}
       role={interactive ? 'button' : undefined}
       tabIndex={interactive ? 0 : undefined}
+      aria-label={interactive && shouldShowModifierBadge ? `${modifierLabel} vial` : undefined}
       aria-pressed={interactive ? isSelected : undefined}
       animate={
         isGameVariant
@@ -127,6 +135,21 @@ export function Vial({
       }}
       style={{ cursor: interactive ? 'pointer' : 'default' }}
     >
+      {shouldShowModifierBadge && (
+        <motion.div
+          className={`vial__modifier-badge vial__modifier-badge--${modifier}`}
+          initial={{ y: -6, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
+          title={modifierLabel}
+        >
+          <span className="vial__modifier-icon" aria-hidden="true">
+            {modifier === 'in-only' ? <ArrowDown /> : <ArrowUp />}
+          </span>
+          <span className="vial__modifier-label">{modifierShortLabel}</span>
+        </motion.div>
+      )}
+
       <svg
         className="vial__svg"
         viewBox={`0 0 ${geometry.viewBoxWidth} ${geometry.viewBoxHeight}`}

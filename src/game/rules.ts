@@ -1,4 +1,5 @@
-import { type Color, type GameState, type Vial, VIAL_CAPACITY } from './types';
+import { canUseVialAsSource, canUseVialAsTarget } from './modifiers';
+import { type Color, type GameState, type Vial, type VialModifier, VIAL_CAPACITY } from './types';
 
 export function revealTopSegments(state: GameState): GameState {
   let changed = false;
@@ -79,8 +80,18 @@ export function isCompletedVisibleVial(vial: Vial, hidden: boolean[] = []): bool
   return isVialComplete(vial) && !hidden.some(Boolean);
 }
 
-export function canPour(source: Vial, dest: Vial): boolean {
-  if (source.length === 0 || dest.length >= VIAL_CAPACITY) {
+export function canPour(
+  source: Vial,
+  dest: Vial,
+  sourceModifier: VialModifier = 'none',
+  destModifier: VialModifier = 'none'
+): boolean {
+  if (
+    source.length === 0 ||
+    dest.length >= VIAL_CAPACITY ||
+    !canUseVialAsSource(sourceModifier) ||
+    !canUseVialAsTarget(destModifier)
+  ) {
     return false;
   }
 

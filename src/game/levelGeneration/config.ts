@@ -2,22 +2,52 @@ import type { DifficultyTargets, LevelConfig } from './types';
 
 export function getLevelConfig(level: number): LevelConfig {
   if (level <= 5) {
-    return { numColors: 3, numEmpty: 2, reverseSteps: 90, generationAttempts: 10 };
+    return {
+      numColors: 3,
+      numEmpty: 2,
+      reverseSteps: 90,
+      generationAttempts: 10,
+      modifierCounts: { inOnly: 0, outOnly: 0 },
+    };
   }
 
   if (level <= 15) {
-    return { numColors: 5, numEmpty: 2, reverseSteps: 220, generationAttempts: 12 };
+    return {
+      numColors: 5,
+      numEmpty: 2,
+      reverseSteps: 220,
+      generationAttempts: 12,
+      modifierCounts: { inOnly: 1, outOnly: 0 },
+    };
   }
 
   if (level <= 25) {
-    return { numColors: 7, numEmpty: 2, reverseSteps: 500, generationAttempts: 14 };
+    return {
+      numColors: 7,
+      numEmpty: 2,
+      reverseSteps: 500,
+      generationAttempts: 14,
+      modifierCounts: { inOnly: 1, outOnly: 1 },
+    };
   }
 
   if (level <= 40) {
-    return { numColors: 9, numEmpty: 2, reverseSteps: 600, generationAttempts: 16 };
+    return {
+      numColors: 9,
+      numEmpty: 2,
+      reverseSteps: 600,
+      generationAttempts: 16,
+      modifierCounts: { inOnly: 1, outOnly: 1 },
+    };
   }
 
-  return { numColors: 10, numEmpty: 2, reverseSteps: 900, generationAttempts: 18 };
+  return {
+    numColors: 10,
+    numEmpty: 2,
+    reverseSteps: 900,
+    generationAttempts: 18,
+    modifierCounts: { inOnly: 1, outOnly: 2 },
+  };
 }
 
 export function getDifficultyTargets(level: number, numColors: number): DifficultyTargets {
