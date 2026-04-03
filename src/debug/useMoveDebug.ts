@@ -1,5 +1,10 @@
 import { useMemo } from 'react';
-import { analyzeMoveAvailability, hasMovesLeft, type MoveAnalysis, type MoveDebugEntry } from '../game/engine';
+import {
+  analyzeMoveAvailabilityOnBoard,
+  hasMovesLeftOnBoard,
+  type MoveAnalysis,
+  type MoveDebugEntry,
+} from '../game/engine';
 import type { GameState } from '../game/types';
 
 export interface MoveDebugData {
@@ -14,7 +19,7 @@ export function useMoveDebug(state: GameState): MoveDebugData {
   const moveAnalysis = useMemo<MoveAnalysis>(() => {
     if (!import.meta.env.DEV) {
       return {
-        hasMovesLeft: hasMovesLeft(state),
+        hasMovesLeft: hasMovesLeftOnBoard(state.vials, state.hidden, state.vialModifiers),
         validMoves: [],
         skippedMoves: [],
         skipCounts: {
@@ -32,8 +37,8 @@ export function useMoveDebug(state: GameState): MoveDebugData {
       };
     }
 
-    return analyzeMoveAvailability(state);
-  }, [state.vials, state.hidden, state.vialModifiers, state.won, state.moveHistory.length]);
+    return analyzeMoveAvailabilityOnBoard(state.vials, state.hidden, state.vialModifiers);
+  }, [state.vials, state.hidden, state.vialModifiers]);
   const movesRemaining = moveAnalysis.validMoves.length;
   const validMovePreview = useMemo(
     () => moveAnalysis.validMoves.slice(0, 12),

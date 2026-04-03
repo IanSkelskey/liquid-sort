@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { playMusic } from '../audio/music';
-import { primeSoundEffects } from '../audio/sfx';
+import { primeSoundEffects, resumeSoundEffects } from '../audio/sfx';
 
 export function useAppAudioBootstrap(): boolean {
   const [musicStarted, setMusicStarted] = useState(false);
@@ -17,6 +17,7 @@ export function useAppAudioBootstrap(): boolean {
         audioPrimedRef.current = true;
       }
 
+      void resumeSoundEffects();
       void playMusic().then((ok) => {
         if (ok) {
           setMusicStarted(true);

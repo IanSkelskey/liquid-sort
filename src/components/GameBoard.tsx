@@ -1,6 +1,6 @@
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { Vial } from './Vial';
-import { COLOR_VALUES, type GameState } from '../game/types';
+import type { GameState } from '../game/types';
 import { isBoardVialComplete } from '../game/selectors';
 import './GameBoard.css';
 
@@ -10,26 +10,16 @@ interface GameBoardProps {
 }
 
 export const GameBoard = memo(function GameBoard({ state, onSelectVial }: GameBoardProps) {
-  const segmentsByVial = useMemo(
-    () => state.vials.map((vial) => vial.map((color) => COLOR_VALUES[color])),
-    [state.vials]
-  );
-
-  const completionByVial = useMemo(
-    () => state.vials.map((_, i) => isBoardVialComplete(state, i)),
-    [state.vials, state.hidden]
-  );
-
   return (
     <div className="game-board">
       {state.vials.map((_vial, i) => (
         <Vial
           key={i}
-          segments={segmentsByVial[i]}
+          segments={state.vials[i]}
           hiddenMask={state.hidden[i] ?? []}
           modifier={state.vialModifiers[i] ?? 'none'}
           isSelected={state.selectedVial === i}
-          isComplete={completionByVial[i]}
+          isComplete={isBoardVialComplete(state, i)}
           onClick={onSelectVial}
           index={i}
         />

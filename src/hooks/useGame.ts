@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useReducer, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from 'react';
 import type { GameState } from '../game/types';
 import { createGameState } from '../game/levels';
 import { reduceGameState } from '../game/reducer';
@@ -56,7 +56,10 @@ export function useGame() {
   const { play } = useSoundEffects();
   const previousStateRef = useRef(state);
   const stateRef = useRef(state);
-  stateRef.current = state;
+
+  useLayoutEffect(() => {
+    stateRef.current = state;
+  }, [state]);
 
   useEffect(() => {
     const previousState = previousStateRef.current;

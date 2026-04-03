@@ -9,7 +9,7 @@ import { MoveDebugPanel } from '../debug/MoveDebugPanel';
 import { useMoveDebug } from '../debug/useMoveDebug';
 import { playSoundEffect } from '../audio/sfx';
 import { canAddExtraVial, canShuffleSelectedVial, canUndoMove, getLevelReward } from '../game/selectors';
-import { hasMovesLeft } from '../game/engine';
+import { hasMovesLeftOnBoard } from '../game/engine';
 import { UNDO_COST } from '../game/types';
 
 type GameScreenProps = {
@@ -22,7 +22,7 @@ export function GameScreen({ onReturnToSplash }: GameScreenProps) {
   const [showReturnConfirm, setShowReturnConfirm] = useState(false);
 
   const boardHasMovesLeft = useMemo(
-    () => hasMovesLeft(state),
+    () => hasMovesLeftOnBoard(state.vials, state.hidden, state.vialModifiers),
     [state.vials, state.hidden, state.vialModifiers]
   );
   const canUndo = canUndoMove(state);

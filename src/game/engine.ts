@@ -42,6 +42,25 @@ export interface MoveAnalysis {
   skipCounts: Record<MoveSkipReason, number>;
 }
 
+function createMoveAnalysisState(
+  vials: GameState['vials'],
+  hidden: GameState['hidden'],
+  vialModifiers: GameState['vialModifiers']
+): GameState {
+  return {
+    vials,
+    hidden,
+    vialModifiers,
+    selectedVial: null,
+    moveHistory: [],
+    level: 0,
+    moveCount: 0,
+    coins: 0,
+    addedVial: false,
+    won: false,
+  };
+}
+
 function isReversibleSuperficialMove(state: GameState, from: number, to: number): boolean {
   const forwardState = pour(state, from, to);
 
@@ -297,6 +316,14 @@ export function hasMovesLeft(state: GameState): boolean {
   return false;
 }
 
+export function hasMovesLeftOnBoard(
+  vials: GameState['vials'],
+  hidden: GameState['hidden'],
+  vialModifiers: GameState['vialModifiers']
+): boolean {
+  return hasMovesLeft(createMoveAnalysisState(vials, hidden, vialModifiers));
+}
+
 export function analyzeMoveAvailability(state: GameState): MoveAnalysis {
   const skipCounts: Record<MoveSkipReason, number> = {
     'source-empty': 0,
@@ -482,6 +509,14 @@ export function analyzeMoveAvailability(state: GameState): MoveAnalysis {
     skippedMoves,
     skipCounts,
   };
+}
+
+export function analyzeMoveAvailabilityOnBoard(
+  vials: GameState['vials'],
+  hidden: GameState['hidden'],
+  vialModifiers: GameState['vialModifiers']
+): MoveAnalysis {
+  return analyzeMoveAvailability(createMoveAnalysisState(vials, hidden, vialModifiers));
 }
 
 export function calculateReward(level: number, moveCount: number): number {

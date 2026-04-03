@@ -31,24 +31,32 @@ export const VialLiquidLayers = memo(function VialLiquidLayers({
         const isTopRun = run.topIndex === segmentCount - 1;
 
         return (
-          <motion.g key={`${run.startIndex}-${run.count}-${run.color}`}>
-            {/* Main liquid fill — uses spring animation */}
-            <motion.rect
-              x={geometry.liquidX}
-              width={geometry.liquidWidth}
-              height={runHeight}
-              fill={run.color}
-              initial={shouldAnimateSegments ? { y: runY - 18, opacity: 0 } : false}
-              animate={{ y: runY, opacity: 1 }}
-              transition={{
-                type: 'spring',
-                stiffness: 300,
-                damping: 20,
-                delay: shouldAnimateSegments ? run.startIndex * 0.03 : 0,
-              }}
-            />
+          <g key={`${run.startIndex}-${run.count}-${run.color}`}>
+            {shouldAnimateSegments ? (
+              <motion.rect
+                x={geometry.liquidX}
+                width={geometry.liquidWidth}
+                height={runHeight}
+                fill={run.color}
+                initial={{ y: runY - 18, opacity: 0 }}
+                animate={{ y: runY, opacity: 1 }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 300,
+                  damping: 20,
+                  delay: run.startIndex * 0.03,
+                }}
+              />
+            ) : (
+              <rect
+                x={geometry.liquidX}
+                y={runY}
+                width={geometry.liquidWidth}
+                height={runHeight}
+                fill={run.color}
+              />
+            )}
 
-            {/* Decorative elements use plain SVG — no animation overhead */}
             {!run.hidden && (
               <rect
                 x={geometry.liquidX + geometry.liquidWidth * 0.08}
@@ -109,7 +117,7 @@ export const VialLiquidLayers = memo(function VialLiquidLayers({
                 fill="rgba(255,255,255,0.34)"
               />
             )}
-          </motion.g>
+          </g>
         );
       })}
     </>

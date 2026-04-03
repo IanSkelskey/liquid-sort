@@ -1,4 +1,15 @@
-export type SoundEffectName = 'pickupVial' | 'putDownVial' | 'levelComplete' | 'pour' | 'vialFull' | 'addVial' | 'popUp' | 'reveal' | 'shuffle' | 'undo' | 'noMoves';
+export type SoundEffectName =
+  | 'pickupVial'
+  | 'putDownVial'
+  | 'levelComplete'
+  | 'pour'
+  | 'vialFull'
+  | 'addVial'
+  | 'popUp'
+  | 'reveal'
+  | 'shuffle'
+  | 'undo'
+  | 'noMoves';
 
 const soundEffectSources: Record<SoundEffectName, string> = {
   pickupVial: new URL('../assets/sound/glass_clink.mp3', import.meta.url).href,
@@ -28,11 +39,30 @@ const defaultVolumes: Record<SoundEffectName, number> = {
   noMoves: 0.5,
 };
 
+type PlaySoundEffectOptions = {
+  volume?: number;
+  durationMs?: number;
+};
+
+type AudioContextConstructor = new () => AudioContext;
+type WindowWithWebkitAudioContext = Window & {
+  webkitAudioContext?: AudioContextConstructor;
+};
+
 let sfxMasterVolume = 1;
 let sfxMuted = false;
 
+const htmlAudioPools = new Map<SoundEffectName, HTMLAudioElement[]>();
+const htmlPlaybackStopTimers = new WeakMap<HTMLAudioElement, number>();
+const decodedSoundBuffers = new Map<SoundEffectName, AudioBuffer>();
+const soundBufferPromises = new Map<SoundEffectName, Promise<AudioBuffer | null>>();
+
+let webAudioContext: AudioContext | null | undefined;
+let webAudioMasterGain: GainNode | null = null;
+
 export function setSfxVolume(volume: number): void {
   sfxMasterVolume = Math.max(0, Math.min(1, volume));
+  syncWebAudioMasterGain();
 }
 
 export function getSfxVolume(): number {
@@ -41,61 +71,94 @@ export function getSfxVolume(): number {
 
 export function setSfxMuted(muted: boolean): void {
   sfxMuted = muted;
+  syncWebAudioMasterGain();
 }
 
 export function isSfxMuted(): boolean {
   return sfxMuted;
 }
 
-const soundPools = new Map<SoundEffectName, HTMLAudioElement[]>();
-const playbackStopTimers = new WeakMap<HTMLAudioElement, number>();
+function getAudioContextConstructor(): AudioContextConstructor | undefined {
+  if (typeof window === 'undefined') {
+    return undefined;
+  }
 
-function getSoundPool(name: SoundEffectName): HTMLAudioElement[] {
-  let pool = soundPools.get(name);
+  const withWebkit = window as WindowWithWebkitAudioContext;
+  return window.AudioContext ?? withWebkit.webkitAudioContext;
+}
+
+function getWebAudioContext(): AudioContext | null {
+  if (webAudioContext !== undefined) {
+    return webAudioContext;
+  }
+
+  const AudioContextCtor = getAudioContextConstructor();
+  if (!AudioContextCtor) {
+    webAudioContext = null;
+    return webAudioContext;
+  }
+
+  webAudioContext = new AudioContextCtor();
+  webAudioMasterGain = webAudioContext.createGain();
+  webAudioMasterGain.connect(webAudioContext.destination);
+  syncWebAudioMasterGain();
+
+  return webAudioContext;
+}
+
+function syncWebAudioMasterGain(): void {
+  if (!webAudioMasterGain) {
+    return;
+  }
+
+  webAudioMasterGain.gain.value = sfxMuted ? 0 : sfxMasterVolume;
+}
+
+function getHtmlAudioPool(name: SoundEffectName): HTMLAudioElement[] {
+  let pool = htmlAudioPools.get(name);
   if (!pool) {
     pool = [];
-    soundPools.set(name, pool);
+    htmlAudioPools.set(name, pool);
   }
   return pool;
 }
 
-function createAudioInstance(name: SoundEffectName): HTMLAudioElement {
+function createHtmlAudioInstance(name: SoundEffectName): HTMLAudioElement {
   const audio = new Audio(soundEffectSources[name]);
   audio.preload = 'auto';
   return audio;
 }
 
-export function primeSoundEffects(): void {
-  for (const name of Object.keys(soundEffectSources) as SoundEffectName[]) {
-    const pool = getSoundPool(name);
-    if (pool.length === 0) {
-      pool.push(createAudioInstance(name));
-    }
-    pool[0].load();
+function primeHtmlAudioEffect(name: SoundEffectName): void {
+  const pool = getHtmlAudioPool(name);
+  if (pool.length === 0) {
+    pool.push(createHtmlAudioInstance(name));
   }
+  pool[0].load();
 }
 
-export function playSoundEffect(
-  name: SoundEffectName,
-  options?: { volume?: number; durationMs?: number }
-): void {
-  if (typeof Audio === 'undefined') return;
+function playHtmlAudioEffect(name: SoundEffectName, options?: PlaySoundEffectOptions): void {
+  if (typeof Audio === 'undefined') {
+    return;
+  }
 
-  const pool = getSoundPool(name);
+  const pool = getHtmlAudioPool(name);
   const reusableAudio = pool.find((audio) => audio.paused || audio.ended);
-  const audio = reusableAudio ?? createAudioInstance(name);
+  const audio = reusableAudio ?? createHtmlAudioInstance(name);
 
   if (!reusableAudio) {
     pool.push(audio);
   }
 
-  const stopTimer = playbackStopTimers.get(audio);
+  const stopTimer = htmlPlaybackStopTimers.get(audio);
   if (stopTimer !== undefined) {
     window.clearTimeout(stopTimer);
-    playbackStopTimers.delete(audio);
+    htmlPlaybackStopTimers.delete(audio);
   }
 
-  if (sfxMuted) return;
+  if (sfxMuted) {
+    return;
+  }
 
   audio.currentTime = 0;
   audio.volume = (options?.volume ?? defaultVolumes[name]) * sfxMasterVolume;
@@ -108,9 +171,119 @@ export function playSoundEffect(
     const timer = window.setTimeout(() => {
       audio.pause();
       audio.currentTime = 0;
-      playbackStopTimers.delete(audio);
+      htmlPlaybackStopTimers.delete(audio);
     }, options.durationMs);
 
-    playbackStopTimers.set(audio, timer);
+    htmlPlaybackStopTimers.set(audio, timer);
   }
+}
+
+function loadSoundBuffer(name: SoundEffectName): Promise<AudioBuffer | null> {
+  const cachedBuffer = decodedSoundBuffers.get(name);
+  if (cachedBuffer) {
+    return Promise.resolve(cachedBuffer);
+  }
+
+  const existingPromise = soundBufferPromises.get(name);
+  if (existingPromise) {
+    return existingPromise;
+  }
+
+  const audioContext = getWebAudioContext();
+  if (!audioContext) {
+    return Promise.resolve(null);
+  }
+
+  const loadPromise = fetch(soundEffectSources[name])
+    .then((response) => response.arrayBuffer())
+    .then((arrayBuffer) => audioContext.decodeAudioData(arrayBuffer.slice(0)))
+    .then((decodedBuffer) => {
+      decodedSoundBuffers.set(name, decodedBuffer);
+      return decodedBuffer;
+    })
+    .catch(() => null);
+
+  soundBufferPromises.set(name, loadPromise);
+  return loadPromise;
+}
+
+function playBufferedSoundEffect(
+  name: SoundEffectName,
+  buffer: AudioBuffer,
+  options?: PlaySoundEffectOptions
+): boolean {
+  const audioContext = getWebAudioContext();
+  if (!audioContext || !webAudioMasterGain) {
+    return false;
+  }
+
+  if (audioContext.state !== 'running') {
+    void audioContext.resume().catch(() => {
+      // Ignore resume failures and allow the fallback path to handle playback.
+    });
+    return false;
+  }
+
+  const source = audioContext.createBufferSource();
+  const gainNode = audioContext.createGain();
+
+  gainNode.gain.value = options?.volume ?? defaultVolumes[name];
+  source.buffer = buffer;
+  source.connect(gainNode);
+  gainNode.connect(webAudioMasterGain);
+  source.start();
+
+  if (options?.durationMs !== undefined) {
+    source.stop(audioContext.currentTime + options.durationMs / 1000);
+  }
+
+  return true;
+}
+
+export function primeSoundEffects(): void {
+  const audioContext = getWebAudioContext();
+
+  for (const name of Object.keys(soundEffectSources) as SoundEffectName[]) {
+    if (audioContext) {
+      void loadSoundBuffer(name);
+      continue;
+    }
+
+    primeHtmlAudioEffect(name);
+  }
+}
+
+export async function resumeSoundEffects(): Promise<boolean> {
+  const audioContext = getWebAudioContext();
+
+  if (!audioContext) {
+    return true;
+  }
+
+  try {
+    if (audioContext.state === 'suspended') {
+      await audioContext.resume();
+    }
+    return audioContext.state === 'running';
+  } catch {
+    return false;
+  }
+}
+
+export function playSoundEffect(name: SoundEffectName, options?: PlaySoundEffectOptions): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  if (sfxMuted || sfxMasterVolume === 0) {
+    return;
+  }
+
+  const decodedBuffer = decodedSoundBuffers.get(name);
+  if (decodedBuffer && playBufferedSoundEffect(name, decodedBuffer, options)) {
+    return;
+  }
+
+  void loadSoundBuffer(name);
+  playHtmlAudioEffect(name, options);
 }

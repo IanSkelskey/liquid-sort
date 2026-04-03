@@ -26,6 +26,7 @@
   flex: 0 0 auto;
   overflow: visible;
   transform-origin: center bottom;
+  will-change: transform;
   outline: none;
 }
 
@@ -61,8 +62,6 @@
 
 .vial__glow-element {
   filter: drop-shadow(0 0 4px var(--vial-glow-color, transparent));
-}
-  overflow: visible;
 }
 
 .vial__modifier-badge {

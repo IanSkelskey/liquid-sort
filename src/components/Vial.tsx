@@ -2,7 +2,7 @@ import { memo, useCallback, useId, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowDown, ArrowUp, Check } from 'lucide-react';
 import { getVialModifierLabel, getVialModifierShortLabel, hasVialModifier } from '../game/modifiers';
-import { VIAL_CAPACITY, type VialModifier } from '../game/types';
+import { COLOR_VALUES, VIAL_CAPACITY, type Color, type VialModifier } from '../game/types';
 import { VialDefinitions } from './vial/VialDefinitions';
 import { VialLiquidLayers } from './vial/VialLiquidLayers';
 import { buildLiquidRuns } from './vial/liquidRuns';
@@ -16,7 +16,7 @@ import {
 import './Vial.css';
 
 interface VialProps {
-  segments: string[];
+  segments: readonly (Color | string)[];
   hiddenMask?: boolean[];
   modifier?: VialModifier;
   isSelected?: boolean;
@@ -44,17 +44,21 @@ export const Vial = memo(function Vial({
   const shouldAnimateSegments = isGameVariant;
   const shouldShowBadge = isGameVariant && isComplete && segments.length > 0;
   const shouldShowModifierBadge = hasVialModifier(modifier);
+  const displaySegments = useMemo(
+    () => segments.map((segment) => COLOR_VALUES[segment as Color] ?? segment),
+    [segments]
+  );
   const revealedIndices = useRevealedSegments(hiddenMask, segments.length, isGameVariant);
   const geometry = VIAL_GEOMETRY[variant];
   const id = useId().replace(/:/g, '-');
 
   const liquidRuns = useMemo(
-    () => buildLiquidRuns(segments, hiddenMask, revealedIndices),
-    [segments, hiddenMask, revealedIndices]
+    () => buildLiquidRuns(displaySegments, hiddenMask, revealedIndices),
+    [displaySegments, hiddenMask, revealedIndices]
   );
 
   const interactive = typeof onClick === 'function';
-  const completeColor = segments[0] ?? 'var(--vial-outline-selected)';
+  const completeColor = displaySegments[0] ?? 'var(--vial-outline-selected)';
   const modifierLabel = getVialModifierLabel(modifier);
   const modifierShortLabel = getVialModifierShortLabel(modifier);
   const outlineColor = isComplete && segments.length > 0
