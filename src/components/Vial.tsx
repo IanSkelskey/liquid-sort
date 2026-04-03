@@ -168,7 +168,6 @@ export const Vial = memo(function Vial({
         <VialDefinitions
           geometry={geometry}
           ids={ids}
-          variant={variant}
           liquidPath={liquidPath}
         />
 

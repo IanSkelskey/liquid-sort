@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import type { VialGeometry, VialVariant } from './vialGeometry';
+import type { VialGeometry } from './vialGeometry';
 
 type VialDefinitionIds = {
   glassGradientId: string;
@@ -12,14 +12,12 @@ type VialDefinitionIds = {
 interface VialDefinitionsProps {
   geometry: VialGeometry;
   ids: VialDefinitionIds;
-  variant: VialVariant;
   liquidPath: string;
 }
 
 export const VialDefinitions = memo(function VialDefinitions({
   geometry,
   ids,
-  variant,
   liquidPath,
 }: VialDefinitionsProps) {
   return (
