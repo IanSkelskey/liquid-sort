@@ -71,8 +71,6 @@ export const Vial = memo(function Vial({
     shineGradientId: `${id}-shine`,
     liquidGlossId: `${id}-liquid-gloss`,
     liquidClipId: `${id}-liquid-clip`,
-    glassShadowId: `${id}-glass-shadow`,
-    glowId: `${id}-glow`,
   };
 
   const glassPath = buildBottomRoundedPath(
@@ -172,8 +170,6 @@ export const Vial = memo(function Vial({
           ids={ids}
           variant={variant}
           liquidPath={liquidPath}
-          completeColor={completeColor}
-          showGlow={isComplete && segments.length > 0}
         />
 
         {isComplete && segments.length > 0 && (
@@ -196,7 +192,7 @@ export const Vial = memo(function Vial({
         <path
           d={glassPath}
           fill={`url(#${ids.glassGradientId})`}
-          filter={`url(#${ids.glassShadowId})`}
+          className="vial__glass-fill"
         />
 
         <g clipPath={`url(#${ids.liquidClipId})`}>
@@ -216,7 +212,8 @@ export const Vial = memo(function Vial({
           fill="none"
           stroke={outlineColor}
           strokeWidth={outlineWidth}
-          filter={isComplete && segments.length > 0 ? `url(#${ids.glowId})` : undefined}
+          className={isComplete && segments.length > 0 ? 'vial__glow-element' : undefined}
+          style={isComplete && segments.length > 0 ? { '--vial-glow-color': completeColor } as React.CSSProperties : undefined}
         />
 
         <rect
@@ -228,7 +225,8 @@ export const Vial = memo(function Vial({
           fill={`url(#${ids.rimGradientId})`}
           stroke={isComplete ? completeColor : 'var(--vial-rim-stroke)'}
           strokeWidth={outlineWidth * 0.55}
-          filter={isComplete && segments.length > 0 ? `url(#${ids.glowId})` : undefined}
+          className={isComplete && segments.length > 0 ? 'vial__glow-element' : undefined}
+          style={isComplete && segments.length > 0 ? { '--vial-glow-color': completeColor } as React.CSSProperties : undefined}
         />
 
         <rect

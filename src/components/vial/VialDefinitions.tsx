@@ -7,8 +7,6 @@ type VialDefinitionIds = {
   shineGradientId: string;
   liquidGlossId: string;
   liquidClipId: string;
-  glassShadowId: string;
-  glowId: string;
 };
 
 interface VialDefinitionsProps {
@@ -16,8 +14,6 @@ interface VialDefinitionsProps {
   ids: VialDefinitionIds;
   variant: VialVariant;
   liquidPath: string;
-  completeColor: string;
-  showGlow: boolean;
 }
 
 export const VialDefinitions = memo(function VialDefinitions({
@@ -25,8 +21,6 @@ export const VialDefinitions = memo(function VialDefinitions({
   ids,
   variant,
   liquidPath,
-  completeColor,
-  showGlow,
 }: VialDefinitionsProps) {
   return (
     <defs>
@@ -57,26 +51,6 @@ export const VialDefinitions = memo(function VialDefinitions({
       <clipPath id={ids.liquidClipId}>
         <path d={liquidPath} />
       </clipPath>
-      <filter id={ids.glassShadowId} x="-35%" y="-20%" width="170%" height="170%">
-        <feDropShadow
-          dx="0"
-          dy={variant === 'splash' ? '10' : '8'}
-          stdDeviation={variant === 'splash' ? '6' : '5'}
-          floodColor="var(--vial-glass-shadow)"
-          floodOpacity="0.9"
-        />
-      </filter>
-      {showGlow && (
-        <filter id={ids.glowId} x="-60%" y="-60%" width="220%" height="220%">
-          <feGaussianBlur stdDeviation="4" result="blur" />
-          <feFlood floodColor={completeColor} floodOpacity="0.45" result="color" />
-          <feComposite in="color" in2="blur" operator="in" result="shadow" />
-          <feMerge>
-            <feMergeNode in="shadow" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      )}
     </defs>
   );
 });

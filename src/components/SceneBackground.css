@@ -78,6 +78,8 @@
   border-radius: 999px;
   filter: blur(var(--scene-glow-blur));
   opacity: var(--scene-glow-opacity);
+  will-change: opacity;
+  contain: strict;
 }
 
 .scene-background__glow--1 {
@@ -204,5 +206,27 @@
     --scene-bubble-rest-opacity: 0.36;
     --scene-bubble-peak-opacity: 0.62;
     --scene-bubble-float-distance: -12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-background__bubble {
+    animation: none;
+  }
+
+  .scene-background__glow {
+    filter: none;
+    opacity: 0;
+  }
+
+  .scene-background__layer,
+  .scene-background__glow,
+  .scene-background__stars,
+  .scene-background__bubble {
+    transition: none;
+  }
+
+  .scene-background {
+    transition: none;
   }
 }

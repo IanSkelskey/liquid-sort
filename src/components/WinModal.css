@@ -354,3 +354,18 @@
     min-width: 0;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .win-overlay {
+    backdrop-filter: none;
+  }
+
+  .win-modal {
+    backdrop-filter: none;
+  }
+
+  .win-modal-glow {
+    filter: none;
+    display: none;
+  }
+}

@@ -32,6 +32,7 @@ export const VialLiquidLayers = memo(function VialLiquidLayers({
 
         return (
           <motion.g key={`${run.startIndex}-${run.count}-${run.color}`}>
+            {/* Main liquid fill — uses spring animation */}
             <motion.rect
               x={geometry.liquidX}
               width={geometry.liquidWidth}
@@ -47,8 +48,9 @@ export const VialLiquidLayers = memo(function VialLiquidLayers({
               }}
             />
 
+            {/* Decorative elements use plain SVG — no animation overhead */}
             {!run.hidden && (
-              <motion.rect
+              <rect
                 x={geometry.liquidX + geometry.liquidWidth * 0.08}
                 width={geometry.liquidWidth * (variant === 'splash' ? 0.24 : 0.22)}
                 height={Math.max(runHeight - 8, 0)}
@@ -56,25 +58,16 @@ export const VialLiquidLayers = memo(function VialLiquidLayers({
                 rx={999}
                 fill={`url(#${liquidGlossId})`}
                 opacity={variant === 'splash' ? 0.34 : 0.3}
-                initial={shouldAnimateSegments ? { y: runY - 18, opacity: 0 } : false}
-                animate={{ y: runY + 4, opacity: variant === 'splash' ? 0.34 : 0.3 }}
-                transition={{
-                  duration: 0.28,
-                  delay: shouldAnimateSegments ? run.startIndex * 0.03 + 0.06 : 0,
-                }}
               />
             )}
 
             {!isTopRun && (
-              <motion.rect
+              <rect
                 x={geometry.liquidX + 1}
                 y={runY}
                 width={geometry.liquidWidth - 2}
                 height={1.5}
                 fill="var(--vial-liquid-divider)"
-                initial={shouldAnimateSegments ? { opacity: 0 } : false}
-                animate={{ opacity: 1 }}
-                transition={{ delay: shouldAnimateSegments ? run.topIndex * 0.03 + 0.08 : 0 }}
               />
             )}
 
@@ -93,7 +86,7 @@ export const VialLiquidLayers = memo(function VialLiquidLayers({
             )}
 
             {run.hidden && (
-              <motion.text
+              <text
                 x={geometry.viewBoxWidth / 2}
                 y={runY + runHeight / 2 + 5}
                 textAnchor="middle"
@@ -101,25 +94,19 @@ export const VialLiquidLayers = memo(function VialLiquidLayers({
                 fontSize={variant === 'splash' ? '16' : '15'}
                 fontWeight="800"
                 style={{ pointerEvents: 'none', userSelect: 'none' }}
-                initial={shouldAnimateSegments ? { opacity: 0 } : false}
-                animate={{ opacity: 1 }}
-                transition={{ delay: shouldAnimateSegments ? run.startIndex * 0.03 + 0.1 : 0 }}
               >
                 ?
-              </motion.text>
+              </text>
             )}
 
             {isTopRun && !run.hidden && (
-              <motion.rect
+              <rect
                 x={geometry.liquidX + 4}
                 y={runY + 2}
                 width={geometry.liquidWidth - 8}
                 height={3}
                 rx={1.5}
                 fill="rgba(255,255,255,0.34)"
-                initial={shouldAnimateSegments ? { opacity: 0 } : false}
-                animate={{ opacity: 1 }}
-                transition={{ delay: shouldAnimateSegments ? run.topIndex * 0.03 + 0.14 : 0 }}
               />
             )}
           </motion.g>
