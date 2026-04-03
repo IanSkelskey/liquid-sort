@@ -33,7 +33,7 @@ export function useMoveDebug(state: GameState): MoveDebugData {
     }
 
     return analyzeMoveAvailability(state);
-  }, [state]);
+  }, [state.vials, state.hidden, state.vialModifiers, state.won, state.moveHistory.length]);
   const movesRemaining = moveAnalysis.validMoves.length;
   const validMovePreview = useMemo(
     () => moveAnalysis.validMoves.slice(0, 12),

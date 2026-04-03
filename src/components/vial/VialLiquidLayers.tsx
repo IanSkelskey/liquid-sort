@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import type { LiquidRun } from './liquidRuns';
 import type { VialGeometry, VialVariant } from './vialGeometry';
@@ -12,7 +13,7 @@ interface VialLiquidLayersProps {
   shouldAnimateSegments: boolean;
 }
 
-export function VialLiquidLayers({
+export const VialLiquidLayers = memo(function VialLiquidLayers({
   liquidRuns,
   geometry,
   variant,
@@ -126,4 +127,4 @@ export function VialLiquidLayers({
       })}
     </>
   );
-}
+});

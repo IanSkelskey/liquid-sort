@@ -1,4 +1,4 @@
-import { useId, useMemo } from 'react';
+import { memo, useCallback, useId, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowDown, ArrowUp, Check } from 'lucide-react';
 import { getVialModifierLabel, getVialModifierShortLabel, hasVialModifier } from '../game/modifiers';
@@ -20,19 +20,21 @@ interface VialProps {
   hiddenMask?: boolean[];
   modifier?: VialModifier;
   isSelected?: boolean;
-  onClick?: () => void;
+  onClick?: ((index: number) => void) | (() => void);
+  index?: number;
   isComplete?: boolean;
   capacity?: number;
   variant?: VialVariant;
   className?: string;
 }
 
-export function Vial({
+export const Vial = memo(function Vial({
   segments,
   hiddenMask = [],
   modifier = 'none',
   isSelected = false,
   onClick,
+  index,
   isComplete = false,
   capacity = VIAL_CAPACITY,
   variant = 'game',
@@ -89,16 +91,26 @@ export function Vial({
   );
   const shinePath = buildSideShinePath(geometry);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleClick = useCallback(() => {
+    if (onClick) {
+      if (index !== undefined) {
+        (onClick as (index: number) => void)(index);
+      } else {
+        (onClick as () => void)();
+      }
+    }
+  }, [onClick, index]);
+
+  const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
     if (!interactive) {
       return;
     }
 
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      onClick();
+      handleClick();
     }
-  };
+  }, [interactive, handleClick]);
 
   const classes = [
     'vial',
@@ -115,7 +127,7 @@ export function Vial({
   return (
     <motion.div
       className={classes}
-      onClick={onClick}
+      onClick={handleClick}
       onKeyDown={handleKeyDown}
       role={interactive ? 'button' : undefined}
       tabIndex={interactive ? 0 : undefined}
@@ -263,4 +275,4 @@ export function Vial({
       )}
     </motion.div>
   );
-}
+});

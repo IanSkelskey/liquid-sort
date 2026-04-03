@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { VialGeometry, VialVariant } from './vialGeometry';
 
 type VialDefinitionIds = {
@@ -19,7 +20,7 @@ interface VialDefinitionsProps {
   showGlow: boolean;
 }
 
-export function VialDefinitions({
+export const VialDefinitions = memo(function VialDefinitions({
   geometry,
   ids,
   variant,
@@ -78,4 +79,4 @@ export function VialDefinitions({
       )}
     </defs>
   );
-}
+});

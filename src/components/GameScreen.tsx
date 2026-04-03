@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useGame } from '../hooks/useGame';
 import { Header } from './Header';
 import { Toolbar } from './Toolbar';
@@ -9,6 +9,7 @@ import { MoveDebugPanel } from '../debug/MoveDebugPanel';
 import { useMoveDebug } from '../debug/useMoveDebug';
 import { playSoundEffect } from '../audio/sfx';
 import { canAddExtraVial, canShuffleSelectedVial, canUndoMove, getLevelReward } from '../game/selectors';
+import { hasMovesLeft } from '../game/engine';
 import { UNDO_COST } from '../game/types';
 
 type GameScreenProps = {
@@ -20,14 +21,17 @@ export function GameScreen({ onReturnToSplash }: GameScreenProps) {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showReturnConfirm, setShowReturnConfirm] = useState(false);
 
-  const { moveAnalysis, movesRemaining, totalCandidates, validMovePreview, skipSummary } = useMoveDebug(state);
+  const boardHasMovesLeft = useMemo(
+    () => hasMovesLeft(state),
+    [state.vials, state.hidden, state.vialModifiers]
+  );
   const canUndo = canUndoMove(state);
   const canShuffle = canShuffleSelectedVial(state);
   const canAddVial = canAddExtraVial(state);
   const coinsEarned = getLevelReward(state);
   const canUndoFromStuckModal = canUndo;
 
-  const stuck = !state.won && state.moveHistory.length > 0 && !moveAnalysis.hasMovesLeft;
+  const stuck = !state.won && state.moveHistory.length > 0 && !boardHasMovesLeft;
 
   const prevStuckRef = useRef(stuck);
   useEffect(() => {
@@ -105,13 +109,21 @@ export function GameScreen({ onReturnToSplash }: GameScreenProps) {
         icon="?"
       />
 
-      <MoveDebugPanel
-        moveAnalysis={moveAnalysis}
-        movesRemaining={movesRemaining}
-        totalCandidates={totalCandidates}
-        validMovePreview={validMovePreview}
-        skipSummary={skipSummary}
-      />
+      {import.meta.env.DEV && <DevMoveDebugPanel state={state} />}
     </div>
+  );
+}
+
+function DevMoveDebugPanel({ state }: { state: import('../game/types').GameState }) {
+  const { moveAnalysis, movesRemaining, totalCandidates, validMovePreview, skipSummary } = useMoveDebug(state);
+
+  return (
+    <MoveDebugPanel
+      moveAnalysis={moveAnalysis}
+      movesRemaining={movesRemaining}
+      totalCandidates={totalCandidates}
+      validMovePreview={validMovePreview}
+      skipSummary={skipSummary}
+    />
   );
 }

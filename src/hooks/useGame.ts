@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useReducer, useRef } from 'react';
-import { canUseVialAsSource, getVialModifier } from '../game/modifiers';
 import type { GameState } from '../game/types';
 import { createGameState } from '../game/levels';
 import { reduceGameState } from '../game/reducer';
 import { isCompletedVisibleVial, canPour, getTopRevealedCount } from '../game/rules';
-import { canAddExtraVial, canShuffleSelectedVial, canUndoMove } from '../game/selectors';
+import { canAddExtraVial, canSelectVialAsSource, canShuffleSelectedVial, canUndoMove } from '../game/selectors';
+import { getVialModifier } from '../game/modifiers';
 import { clearSave, getSavedLevel, saveCoins, saveLevel } from '../game/storage';
 import { useSoundEffects } from './useSoundEffects';
 
@@ -33,13 +33,6 @@ function canAttemptPour(state: GameState, fromIndex: number, toIndex: number): b
   return getTopRevealedCount(source, sourceHidden) > 0;
 }
 
-function canSelectVialAsSource(state: GameState, index: number): boolean {
-  return (
-    state.vials[index].length > 0 &&
-    canUseVialAsSource(getVialModifier(state.vialModifiers, index))
-  );
-}
-
 function shouldPlayPickupOnClick(state: GameState, index: number): boolean {
   if (state.won) {
     return false;
@@ -62,6 +55,8 @@ export function useGame() {
   );
   const { play } = useSoundEffects();
   const previousStateRef = useRef(state);
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
   useEffect(() => {
     const previousState = previousStateRef.current;
@@ -110,25 +105,25 @@ export function useGame() {
 
   const selectVial = useCallback(
     (index: number) => {
-      if (shouldPlayPickupOnClick(state, index)) {
+      if (shouldPlayPickupOnClick(stateRef.current, index)) {
         play('pickupVial');
-      } else if (state.selectedVial === index) {
+      } else if (stateRef.current.selectedVial === index) {
         play('putDownVial');
       }
 
       dispatch({ type: 'SELECT_VIAL', index });
     },
-    [play, state]
+    [play]
   );
 
   const undoMove = useCallback(() => {
-    if (!canUndoMove(state)) {
+    if (!canUndoMove(stateRef.current)) {
       return;
     }
 
     play('undo');
     dispatch({ type: 'UNDO' });
-  }, [play, state]);
+  }, [play]);
 
   const restart = useCallback(() => {
     dispatch({ type: 'RESTART' });
@@ -140,23 +135,23 @@ export function useGame() {
 
   const shuffleSelected = useCallback(
     (index: number) => {
-      if (!canShuffleSelectedVial(state) || state.selectedVial !== index) {
+      if (!canShuffleSelectedVial(stateRef.current) || stateRef.current.selectedVial !== index) {
         return;
       }
 
       play('shuffle');
       dispatch({ type: 'SHUFFLE_VIAL', index });
     },
-    [play, state]
+    [play]
   );
 
   const addVial = useCallback(() => {
-    if (!canAddExtraVial(state)) {
+    if (!canAddExtraVial(stateRef.current)) {
       return;
     }
 
     dispatch({ type: 'ADD_VIAL' });
-  }, [state]);
+  }, []);
 
   const resetGame = useCallback(() => {
     clearSave();

@@ -1,6 +1,14 @@
 import { ADD_VIAL_COST, SHUFFLE_COST, type GameState, type Vial, UNDO_COST } from './types';
 import { calculateReward } from './engine';
+import { canUseVialAsSource, getVialModifier } from './modifiers';
 import { isCompletedVisibleVial } from './rules';
+
+export function canSelectVialAsSource(state: GameState, index: number): boolean {
+  return (
+    state.vials[index].length > 0 &&
+    canUseVialAsSource(getVialModifier(state.vialModifiers, index))
+  );
+}
 
 export function isBoardVialComplete(state: GameState, vialIndex: number): boolean {
   return isCompletedVisibleVial(state.vials[vialIndex], state.hidden[vialIndex] ?? []);
