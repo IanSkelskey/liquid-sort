@@ -1,9 +1,28 @@
 import assert from 'node:assert/strict';
 import * as engine from '../src/game/engine.ts';
+import { getDifficultyTargets, getLevelConfig } from '../src/game/levelGeneration/config.ts';
 import * as levels from '../src/game/levels.ts';
 
 function isSolvedLayout(vials) {
   return vials.every((vial) => vial.length === 0 || vial.every((color) => color === vial[0]));
+}
+
+function countCompleteVials(vials) {
+  return vials.filter(
+    (vial) => vial.length === 4 && vial.every((color) => color === vial[0])
+  ).length;
+}
+
+function assertCompleteVialLimit(level) {
+  const state = levels.createGameState(level, 0);
+  const { numColors } = getLevelConfig(level);
+  const maxCompleteVials = getDifficultyTargets(level, numColors).maxCompleteVials;
+  const completeVials = countCompleteVials(state.vials);
+
+  assert.ok(
+    completeVials <= maxCompleteVials,
+    `Level ${level} started with ${completeVials} complete vials (max ${maxCompleteVials})`
+  );
 }
 
 export function runGameLevelsTests() {
@@ -21,6 +40,7 @@ export function runGameLevelsTests() {
       true,
       `Level ${level} started with no moves`
     );
+    assertCompleteVialLimit(level);
   }
 
   const modifierIntroState = levels.createGameState(15, 0);
@@ -34,6 +54,10 @@ export function runGameLevelsTests() {
     directionalState.vialModifiers.includes('out-only'),
     'Level 30 should include an OUT-only vial'
   );
+
+  for (const level of [115, 150]) {
+    assertCompleteVialLimit(level);
+  }
 
   const original = levels.generateLevel(28);
   const repeated = levels.generateLevel(28);

@@ -18,6 +18,7 @@ import {
   cloneHidden,
   cloneVialModifiers,
   cloneVials,
+  countCompleteVials,
   createRng,
   getVialLayoutKey,
   hasTargetSilhouette,
@@ -66,6 +67,7 @@ function collectLevelCandidates(
   seenCandidateKeys: Set<string>
 ): LevelCandidate[] {
   const candidates: LevelCandidate[] = [];
+  const targets = getDifficultyTargets(level, colors.length);
 
   for (let attempt = 0; attempt < generationAttempts; attempt += 1) {
     const rng = createRng(level * 7919 + 1013 + seedOffset + attempt * 379);
@@ -94,6 +96,10 @@ function collectLevelCandidates(
       const normalizedVials = normalizeVials(vials);
 
       if (isSolvedLayout(normalizedVials)) {
+        continue;
+      }
+
+      if (countCompleteVials(normalizedVials) > targets.maxCompleteVials) {
         continue;
       }
 
@@ -140,37 +146,27 @@ function collectLevelCandidates(
   return candidates;
 }
 
-function rotateTopSegment(vials: Vial[], bufferIndex: number, first: number, second: number, third: number): void {
-  const buffer = vials[bufferIndex];
-  const firstTop = vials[first].pop();
-  const secondTop = vials[second].pop();
-  const thirdTop = vials[third].pop();
+function moveSingleSegment(vials: Vial[], fromIndex: number, toIndex: number): void {
+  const segment = vials[fromIndex].pop();
 
-  if (!firstTop || !secondTop || !thirdTop) {
-    return;
-  }
-
-  buffer.push(firstTop);
-  vials[first].push(secondTop);
-  vials[second].push(thirdTop);
-  const bufferedSegment = buffer.pop();
-
-  if (bufferedSegment) {
-    vials[third].push(bufferedSegment);
+  if (segment) {
+    vials[toIndex].push(segment);
   }
 }
 
 function buildDeterministicFallbackVials(colors: Color[], numEmpty: number): Vial[] {
   const fallbackVials = buildSolvedVials(colors, numEmpty);
+
+  if (numEmpty === 0 || colors.length < 2) {
+    return normalizeVials(fallbackVials);
+  }
+
   const bufferIndex = colors.length;
-  const cycleCount = Math.max(4, Math.min(colors.length * 2, 12));
 
-  for (let cycle = 0; cycle < cycleCount; cycle += 1) {
-    const first = cycle % colors.length;
-    const second = (cycle + 1) % colors.length;
-    const third = (cycle + 2) % colors.length;
-
-    rotateTopSegment(fallbackVials, bufferIndex, first, second, third);
+  for (let colorIndex = 0; colorIndex < colors.length - 1; colorIndex += 1) {
+    moveSingleSegment(fallbackVials, colorIndex, bufferIndex);
+    moveSingleSegment(fallbackVials, colorIndex + 1, colorIndex);
+    moveSingleSegment(fallbackVials, bufferIndex, colorIndex + 1);
   }
 
   return normalizeVials(fallbackVials);
