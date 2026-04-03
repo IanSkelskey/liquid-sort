@@ -1,22 +1,65 @@
-const musicSrc = new URL('../assets/music/gameplay.opus', import.meta.url).href;
+type MusicSource = {
+  src: string;
+  type: string;
+};
+
+const musicSources: MusicSource[] = [
+  {
+    src: new URL('../assets/music/gameplay.mp3', import.meta.url).href,
+    type: 'audio/mpeg',
+  },
+  {
+    src: new URL('../assets/music/gameplay.opus', import.meta.url).href,
+    type: 'audio/ogg; codecs="opus"',
+  },
+];
 
 let audio: HTMLAudioElement | null = null;
 
+function resolveMusicSource(): string {
+  if (typeof Audio === 'undefined') {
+    return musicSources[0].src;
+  }
+
+  const probe = new Audio();
+  const supportedSource = musicSources.find((source) => probe.canPlayType(source.type) !== '');
+
+  return supportedSource?.src ?? musicSources[0].src;
+}
+
 function getAudio(): HTMLAudioElement {
   if (!audio) {
-    audio = new Audio(musicSrc);
+    audio = new Audio(resolveMusicSource());
     audio.loop = true;
     audio.volume = 0.3;
     audio.preload = 'auto';
+    audio.setAttribute('playsinline', 'true');
   }
   return audio;
 }
 
-export function playMusic(): Promise<boolean> {
-  const a = getAudio();
-  if (a.paused) {
-    return a.play().then(() => true).catch(() => false);
+export function primeMusic(): void {
+  if (typeof Audio === 'undefined') {
+    return;
   }
+
+  const music = getAudio();
+  if (music.readyState === 0) {
+    music.load();
+  }
+}
+
+export function playMusic(): Promise<boolean> {
+  const music = getAudio();
+
+  if (music.readyState === 0) {
+    music.load();
+  }
+
+  if (music.paused) {
+    return music.play().then(() => true).catch(() => false);
+  }
+
   return Promise.resolve(true);
 }
 

@@ -29,6 +29,24 @@ import {
 
 const levelDefinitionCache = new Map<number, LevelDefinition>();
 
+function cloneLevelDefinition(definition: LevelDefinition): LevelDefinition {
+  return {
+    vials: cloneVials(definition.vials),
+    hidden: cloneHidden(definition.hidden),
+    vialModifiers: cloneVialModifiers(definition.vialModifiers),
+    score: definition.score,
+    deadEndReachable: definition.deadEndReachable,
+  };
+}
+
+export function hasLevelDefinition(level: number): boolean {
+  return levelDefinitionCache.has(level);
+}
+
+export function cacheLevelDefinition(level: number, definition: LevelDefinition): void {
+  levelDefinitionCache.set(level, cloneLevelDefinition(definition));
+}
+
 function buildDefaultVialModifiers(vialCount: number): VialModifier[] {
   return Array<VialModifier>(vialCount).fill('none');
 }
@@ -231,7 +249,7 @@ export function generateLevelDefinition(level: number): LevelDefinition {
       deadEndReachable: false,
     };
 
-    levelDefinitionCache.set(level, fallbackDefinition);
+    cacheLevelDefinition(level, fallbackDefinition);
     return fallbackDefinition;
   }
 
@@ -310,13 +328,7 @@ export function generateLevelDefinition(level: number): LevelDefinition {
           ? deadEndCandidate
           : candidates[0];
 
-  const cachedSelectedDefinition: LevelDefinition = {
-    vials: cloneVials(selectedDefinition.vials),
-    hidden: cloneHidden(selectedDefinition.hidden),
-    vialModifiers: cloneVialModifiers(selectedDefinition.vialModifiers),
-    score: selectedDefinition.score,
-    deadEndReachable: selectedDefinition.deadEndReachable,
-  };
+  const cachedSelectedDefinition = cloneLevelDefinition(selectedDefinition);
 
   levelDefinitionCache.set(level, cachedSelectedDefinition);
   return cachedSelectedDefinition;

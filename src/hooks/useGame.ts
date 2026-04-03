@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from 'react';
 import type { GameState } from '../game/types';
 import { createGameState } from '../game/levels';
+import { preloadLevelDefinition } from '../game/levelGeneration/preload';
 import { reduceGameState } from '../game/reducer';
 import { isCompletedVisibleVial, canPour, getTopRevealedCount } from '../game/rules';
 import { canAddExtraVial, canSelectVialAsSource, canShuffleSelectedVial, canUndoMove } from '../game/selectors';
@@ -60,6 +61,11 @@ export function useGame() {
   useLayoutEffect(() => {
     stateRef.current = state;
   }, [state]);
+
+  useEffect(() => {
+    preloadLevelDefinition(state.level + 1);
+    preloadLevelDefinition(state.level + 2);
+  }, [state.level]);
 
   useEffect(() => {
     const previousState = previousStateRef.current;
