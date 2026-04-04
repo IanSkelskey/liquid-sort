@@ -12,7 +12,7 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.12);
-  --overlay: rgba(15, 23, 42, 0.45);
+  --overlay: rgba(15, 23, 42, 0.55);
   --gradient-btn: linear-gradient(135deg, #3b82f6, #6366f1);
   --gradient-title: linear-gradient(135deg, #3b82f6, #8b5cf6);
   --game-shell-max-width: 600px;
@@ -39,7 +39,7 @@
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
     --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
     --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.4);
-    --overlay: rgba(0, 0, 0, 0.6);
+    --overlay: rgba(0, 0, 0, 0.7);
     --gradient-btn: linear-gradient(135deg, #4f8ff7, #7c6ef6);
     --gradient-title: linear-gradient(135deg, #60a5fa, #a78bfa);
   }

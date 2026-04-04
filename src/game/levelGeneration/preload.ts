@@ -14,7 +14,18 @@ type WorkerResponse = {
 };
 
 const pendingLevels = new Set<number>();
+const pendingResolvers = new Map<number, Array<() => void>>();
 let preloadWorker: Worker | null | undefined;
+
+function resolvePendingAwaiters(level: number): void {
+  const resolvers = pendingResolvers.get(level);
+  if (resolvers) {
+    pendingResolvers.delete(level);
+    for (const resolve of resolvers) {
+      resolve();
+    }
+  }
+}
 
 function getPreloadWorker(): Worker | null {
   if (typeof window === 'undefined' || typeof Worker === 'undefined') {
@@ -34,6 +45,7 @@ function getPreloadWorker(): Worker | null {
 
       cacheLevelDefinition(event.data.level, event.data.definition);
       pendingLevels.delete(event.data.level);
+      resolvePendingAwaiters(event.data.level);
     });
     preloadWorker.addEventListener('error', () => {
       preloadWorker = null;
@@ -51,6 +63,7 @@ function preloadLevelDefinitionOnMainThread(level: number): void {
       generateLevelDefinition(level);
     } finally {
       pendingLevels.delete(level);
+      resolvePendingAwaiters(level);
     }
   }, 0);
 }
@@ -78,4 +91,25 @@ export function preloadLevelDefinition(level: number): void {
   };
 
   worker.postMessage(request);
+}
+
+export function awaitLevelDefinition(level: number): Promise<void> {
+  if (hasLevelDefinition(level)) {
+    return Promise.resolve();
+  }
+
+  preloadLevelDefinition(level);
+
+  if (hasLevelDefinition(level)) {
+    return Promise.resolve();
+  }
+
+  return new Promise<void>((resolve) => {
+    let resolvers = pendingResolvers.get(level);
+    if (!resolvers) {
+      resolvers = [];
+      pendingResolvers.set(level, resolvers);
+    }
+    resolvers.push(resolve);
+  });
 }

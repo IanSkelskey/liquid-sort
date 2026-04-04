@@ -1,12 +1,13 @@
-import { startTransition, useEffect, useState } from 'react';
+import { lazy, startTransition, Suspense, useCallback, useEffect, useState } from 'react';
 import { AudioControls } from './components/AudioControls';
-import { GameScreen } from './components/GameScreen';
 import { HowToPlayScreen } from './components/HowToPlayScreen';
 import { SceneBackground } from './components/SceneBackground';
-import { preloadLevelDefinition } from './game/levelGeneration/preload';
+import { awaitLevelDefinition, preloadLevelDefinition } from './game/levelGeneration/preload';
 import { getSavedLevel } from './game/storage';
 import SplashScreen from './components/SplashScreen';
 import { useAppAudioBootstrap } from './hooks/useAppAudioBootstrap';
+
+const GameScreen = lazy(() => import('./components/GameScreen'));
 
 type Screen = 'splash' | 'howToPlay' | 'game';
 
@@ -20,22 +21,31 @@ function App() {
     preloadLevelDefinition(savedLevel + 1);
   }, []);
 
+  const handleStartGame = useCallback(() => {
+    const savedLevel = getSavedLevel();
+    awaitLevelDefinition(savedLevel).then(() => {
+      startTransition(() => setActiveScreen('game'));
+    });
+  }, []);
+
   const backgroundVariant = activeScreen === 'game' ? 'game' : 'splash';
 
   return (
     <SceneBackground variant={backgroundVariant}>
       {activeScreen === 'splash' ? (
         <SplashScreen
-          onStart={() => startTransition(() => setActiveScreen('game'))}
+          onStart={handleStartGame}
           onHowToPlay={() => startTransition(() => setActiveScreen('howToPlay'))}
         />
       ) : activeScreen === 'howToPlay' ? (
         <HowToPlayScreen
           onBack={() => startTransition(() => setActiveScreen('splash'))}
-          onStart={() => startTransition(() => setActiveScreen('game'))}
+          onStart={handleStartGame}
         />
       ) : (
-        <GameScreen onReturnToSplash={() => startTransition(() => setActiveScreen('splash'))} />
+        <Suspense>
+          <GameScreen onReturnToSplash={() => startTransition(() => setActiveScreen('splash'))} />
+        </Suspense>
       )}
       <AudioControls />
     </SceneBackground>

@@ -127,3 +127,5 @@ function DevMoveDebugPanel({ state }: { state: import('../game/types').GameState
     />
   );
 }
+
+export default GameScreen;
